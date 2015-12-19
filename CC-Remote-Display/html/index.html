@@ -179,6 +179,7 @@
         var textBuffer = {};
         var textColorBuffer = {};
         var backColorBuffer = {};
+        var displayType = "normal";
 
         socket.on("write", function (params) {
 
@@ -227,10 +228,26 @@
 
         socket.on("setDisplaySize", function (params) {
             width = Number(params[0]);
-            $("#cc-display-width").val(Number(params[0]));
+            oldOptions.width = width;
+            $("#cc-display-width").val(width);
 
             height = Number(params[1]);
-            $("#cc-display-height").val(Number(params[1]));
+            oldOptions.height = height;
+            $("#cc-display-height").val(height);
+        });
+
+        socket.on("allowSizeChange", function (params) {
+            if (params == "true") {
+                $("#cc-display-width").prop("readonly", false);
+                $("#cc-display-height").prop("readonly", false);
+            } else if (params == "false") {
+                $("#cc-display-width").prop("readonly", true);
+                $("#cc-display-height").prop("readonly", true);
+            }
+        });
+
+        socket.on("setDisplayType", function (params) {
+            displayType = params;
         });
 
         //Parse the url for parameters

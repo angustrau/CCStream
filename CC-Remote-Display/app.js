@@ -6,8 +6,6 @@ var io = require("socket.io")(http);
 var connectedRooms = {};
 
 app.get("/", function(req, res) {
-    console.log("Client requested '/'");
-
     res.sendFile(__dirname + "/html/index.html");
 })
 
@@ -54,7 +52,7 @@ app.get("/push", function(req, res) {
 
             break;
         case "setCursorBlink":
-            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1] || !(req.query.param[0] == "true" || req.query.param[0] == "false") || !(req.query.param[1] == "true" || req.query.param[1] == "false")) {
+            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "true" || req.query.param == "false")) {
                 res.status(400).send("Invalid parameter to 'setCursorBlink'");
                 return;    
             }
@@ -95,12 +93,28 @@ app.get("/push", function(req, res) {
             }
 
             break;
+        case "allowSizeChange":
+            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "true" || req.query.param == "false")) {
+                res.status(400).send("Invalid parameter to 'allowSizeChange'");
+                return;    
+            }
+
+            break;
+        case "setDisplayType":
+            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "normal" || req.query.param == "advanced" || req.query.param == "command" || req.query.param == "turtleNormal" || req.query.param == "turtleAdvanced")) {
+                res.status(400).send("Invalid parameter to 'setDisplayType'");
+                return;
+            } 
+
+            break;
         default:
             res.status(400).send("Invalid operation");
             return;
     }
 
     io.to(req.query.id).emit(req.query.op, req.query.param);
+    console.log("Operation '" + req.query.op + "' sent from id '" + req.query.id + "'");
+    res.end("ok");
 })
 
 app.use("/js", express.static(__dirname + "/html/js"));
