@@ -167,6 +167,72 @@
 
         var socket = io();
 
+        var width = $("#cc-display-width").val();
+        var height = $("#cc-display-height").val();
+        var cursorX = 1;
+        var cursorY = 1;
+        var cursorBlink = false;
+        var lastBlinkX = 1;
+        var lastBlinkY = 1;
+        var textColour = 1;
+        var backColour = 32768;
+        var textBuffer = {};
+        var textColorBuffer = {};
+        var backColorBuffer = {};
+
+        socket.on("write", function (params) {
+
+        });
+
+        socket.on("blit", function (params) {
+
+        });
+
+        socket.on("clear", function (params) {
+
+        });
+
+        socket.on("clearLine", function (params) {
+
+        });
+
+        socket.on("setCursorPos", function (params) {
+            cursorX = Number(params[0]);
+            cursorY = Number(params[1]);
+        });
+
+        function blinkCursor() {
+
+        }
+
+        socket.on("setCursorBlink", function (params) {
+            if (params == "true") {
+                cursorBlink = true;
+            } else if (params == "false") {
+                cursorBlink = false;
+            }
+        });
+
+        socket.on("scroll", function (params) {
+
+        });
+
+        socket.on("setTextColor", function (params) {
+            textColour = Number(params);
+        });
+
+        socket.on("setBackgroundColor", function (params) {
+            backColour = Number(params);
+        });
+
+        socket.on("setDisplaySize", function (params) {
+            width = Number(params[0]);
+            $("#cc-display-width").val(Number(params[0]));
+
+            height = Number(params[1]);
+            $("#cc-display-height").val(Number(params[1]));
+        });
+
         //Parse the url for parameters
         var parameters = {}
         window.location.search.substring(1).split("&").forEach(function (v) {
