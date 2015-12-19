@@ -88,9 +88,16 @@ app.get("/push", function(req, res) {
             }
 
             break;
+        case "setDisplaySize":
+            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1]) {
+                res.status(400).send("Invalid parameter to 'setCursorPos'");
+                return;    
+            }
+
+            break;
         default:
             res.status(400).send("Invalid operation");
-            return;    
+            return;
     }
 
     io.to(req.query.id).emit(req.query.op, req.query.param);

@@ -86,7 +86,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-dismiss="modal">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveOptions();">
                         <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
                         Save & Close
                     </button>
@@ -109,10 +110,50 @@
             $('[data-toggle="popover"]').popover(); //Init popovers
         })
 
-        //Close the share toggle on options close
         $("#options").on("hide.bs.modal", function () {
-            $("#share-id").popover("hide");
+            //options close
+            $("#share-id").popover("hide"); //Close share popover
         });
+
+        $("#options").on("hidden.bs.modal", function () {
+            //options closed
+            revertOptions();
+        });
+
+        $("#options").on("show.bs.modal", function () {
+            //options open
+            oldOptions.id = $("#cc-id").val();
+            oldOptions.width = $("#cc-display-width").val();
+            oldOptions.height = $("#cc-display-height").val();
+        });
+
+        var oldOptions = {}
+
+        saveOptions = function () {
+            var id = $("#cc-id").val();
+            if (oldOptions.id != id) {
+
+            }
+            oldOptions.id = id;
+
+            var width = $("#cc-display-width").val();
+            if (oldOptions.width != width) {
+
+            }
+            oldOptions.width = width;
+
+            var height = $("#cc-display-height").val();
+            if (oldOptions.height != height) {
+
+            }
+            oldOptions.height = height;
+        }
+
+        revertOptions = function () {
+            $("#cc-id").val(oldOptions.id);
+            $("#cc-display-width").val(oldOptions.width);
+            $("#cc-display-height").val(oldOptions.height);
+        }
 
         getShareLink = function() {
             var id = document.getElementById("cc-id").value;
@@ -135,11 +176,9 @@
         });
 
         if (parameters["id"]) {
-            //ID provided in url, do not prompt for one
+            //ID provided in url
             $("#cc-id").val(parameters["id"]);
             socket.emit("set id", parameters["id"]);
-        } else {
-            //Prompt for ID to display
         }
     </script>
 </body>
