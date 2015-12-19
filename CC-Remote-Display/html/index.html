@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+</head>
+<body>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        var socket = io();
+
+        //Parse the url for parameters
+        var parameters = {}
+        window.location.search.substring(1).split("&").forEach(function (v) {
+            var kvPair = v.split("=");
+            if (!kvPair[1]) return;
+            parameters[kvPair[0]] = kvPair[1];
+        });
+
+        if (parameters["id"]) {
+            //ID provided in url, do not prompt for one
+            socket.emit("set id", parameters["id"]);
+        } else {
+            //Prompt for ID to display
+        }
+    </script>
+
+    /
+</body>
+</html>
