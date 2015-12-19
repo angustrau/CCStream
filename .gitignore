@@ -49,3 +49,4 @@ Temporary Items
 *.njsproj
 *.sln
 CC-Remote-Display/.ntvs_analysis.dat
+CC-Remote-Display/node_modules
