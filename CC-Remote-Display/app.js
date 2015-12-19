@@ -1,6 +1,9 @@
-﻿var app = require("express")();
+﻿var express = require("express");
+var app = express();
 var http = require("http").Server(app);
 var io = require("socket.io")(http);
+
+var connectedRooms = {};
 
 app.get("/", function(req, res) {
     console.log("Client requested '/'");
@@ -93,6 +96,8 @@ app.get("/push", function(req, res) {
     io.to(req.query.id).emit(req.query.op, req.query.param);
 })
 
+app.use("/js", express.static(__dirname + "/html/js"));
+
 app.use(function(req, res) {
     //Redirect other urls to home
     res.redirect("/");    
@@ -103,12 +108,16 @@ io.on("connection", function(socket) {
 
     socket.on("disconnect", function() {
         console.log("Socket.io client '" + socket.id + "' disconnected");
+
+        if (connectedRooms[socket.id]) delete connectedRooms[socket.id];
     });
 
     socket.on("set id", function(id) {
-        //De-register from previous channel id
         console.log("Socket.io client '" + socket.id + "' has registered to channel ID '" + id + "'");
 
+        if (connectedRooms[socket.id]) socket.leave(connectedRooms[socket.id]); //De-register from previous channel id
+
+        connectedRooms[socket.id] = id;
         socket.join(id);
     });
 });
