@@ -63,7 +63,7 @@
                         <div class="col-lg-6">
                             <div class="input-group">
                                 <span class="input-group-addon">Width</span>
-                                <input id="cc-display-width" type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" max="99" value="51" />
+                                <input id="cc-display-width" type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" value="51" oninput="$('#cc-display-width').val(Math.floor($('#cc-display-width').val()));" />
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The width of the display in pixels. Default is 51.">
                                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
@@ -75,7 +75,7 @@
                         <div class="col-lg-6">
                             <div class="input-group">
                                 <span class="input-group-addon">Height</span>
-                                <input id="cc-display-height" type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" max="99" value="19" />
+                                <input id="cc-display-height" type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" value="19" oninput="$('#cc-display-height').val(Math.floor($('#cc-display-height').val()));" />
                                 <span class="input-group-btn">
                                     <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The height of the display in pixels. Default is 19.">
                                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
