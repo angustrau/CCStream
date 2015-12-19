@@ -1,0 +1,10 @@
+{
+  "name": "CC-Remote-Display",
+  "version": "0.0.0",
+  "description": "CC-Remote-Display",
+  "main": "app.js",
+  "author": {
+    "name": "Angus",
+    "email": ""
+  }
+}
