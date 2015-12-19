@@ -8,6 +8,23 @@
 
     <title>CC Remote Display</title>
 
+    <style>
+        #display {
+            position: fixed;
+            top: 0;
+            bottom: 50px;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
+        }
+
+        #optionsButton {
+            position: fixed;
+            bottom: 10px;
+            left: 10px;
+        }
+    </style>
+
     <link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -26,10 +43,14 @@
                     <label>ID</label>
 
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Enter ID to display..." />
+                        <input id="cc-id" type="text" class="form-control" placeholder="Enter ID to display..." />
                         <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The ID of the display you wish to show. Provided by your in-game ComputerCraft computer.">
+                            <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The ID of the display you wish to show. Provided by your in-game ComputerCraft computer.">
                                 <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                            </button>
+
+                            <button id="share-id" type="button" class="btn btn-default" data-toggle="popover" data-container="body" data-placement="auto right" data-content="Loading..." onmouseover="document.getElementById('share-id').setAttribute('data-content', getShareLink());">
+                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
                             </button>
                         </span>
                     </div>
@@ -42,9 +63,9 @@
                         <div class="col-lg-6">
                             <div class="input-group">
                                 <span class="input-group-addon">Width</span>
-                                <input type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" max="99" value="51" />
+                                <input id="cc-display-width" type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" max="99" value="51" />
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The width of the display in pixels. Default is 51.">
+                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The width of the display in pixels. Default is 51.">
                                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                                     </button>
                                 </span>
@@ -54,9 +75,9 @@
                         <div class="col-lg-6">
                             <div class="input-group">
                                 <span class="input-group-addon">Height</span>
-                                <input type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" max="99" value="19" />
+                                <input id="cc-display-height" type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" max="99" value="19" />
                                 <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The height of the display in pixels. Default is 19.">
+                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The height of the display in pixels. Default is 19.">
                                         <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
                                     </button>
                                 </span>
@@ -76,7 +97,9 @@
 
     <canvas id="display"></canvas>
 
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#options">
+    <p></p>
+
+    <button id="optionsButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#options" height="5%">
         <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
         Options
     </button>
@@ -85,6 +108,21 @@
         $(function () {
             $('[data-toggle="popover"]').popover(); //Init popovers
         })
+
+        //Close the share toggle on options close
+        $("#options").on("hide.bs.modal", function () {
+            $("#share-id").popover("hide");
+        });
+
+        getShareLink = function() {
+            var id = document.getElementById("cc-id").value;
+            var url = window.location.href.split("?")[0];
+            if (id == "") {
+                return "No ID selected...";
+            } else {
+                return url + "?id=" + id + "/";
+            }
+        }
 
         var socket = io();
 
@@ -98,6 +136,7 @@
 
         if (parameters["id"]) {
             //ID provided in url, do not prompt for one
+            $("#cc-id").val(parameters["id"]);
             socket.emit("set id", parameters["id"]);
         } else {
             //Prompt for ID to display
