@@ -23,7 +23,46 @@
                     <h4 class="modal-title" id="optionsLabel">Options</h4>
                 </div>
                 <div class="modal-body">
-                    test
+                    <label>ID</label>
+
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Enter ID to display..." />
+                        <span class="input-group-btn">
+                            <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The ID of the display you wish to show. Provided by your in-game ComputerCraft computer.">
+                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+
+                    <p></p>
+
+                    <label>Display Size</label>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">Width</span>
+                                <input type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" max="99" value="51" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The width of the display in pixels. Default is 51.">
+                                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="input-group">
+                                <span class="input-group-addon">Height</span>
+                                <input type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" max="99" value="19" />
+                                <span class="input-group-btn">
+                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="right" data-content="The height of the display in pixels. Default is 19.">
+                                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                    </button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-primary" data-dismiss="modal">
@@ -43,6 +82,10 @@
     </button>
 
     <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover(); //Init popovers
+        })
+
         var socket = io();
 
         //Parse the url for parameters
