@@ -414,7 +414,72 @@
             });
 
             socket.on("scroll", function (params) {
+                var lines = Number(params);
 
+                //Shift lines down or up
+                if (lines > 0) {
+                    for (y=2; y<=height; y++) {
+                        if (y - lines >= 1) {
+                            for (x=1; x<=width; x++) {
+                                textBuffer[x][y - lines] = textBuffer[x][y];
+                                textColourBuffer[x][y - lines] = textColourBuffer[x][y];
+                                backColourBuffer[x][y - lines] = backColourBuffer[x][y];
+                            }
+                        } else {break;}
+                    }
+
+                    for (y=height; y>=height-lines; y--) {
+                        for (x=1; x<=width; x++) {
+                            textBuffer[x][y] = " ";
+                            textColourBuffer[x][y] = textColour;
+                            backColourBuffer[x][y] = backColour;
+                        }
+                    }
+                } else {
+                    for (y=height - 1; y>=1; y--) {
+                        if (y + lines <= height) {
+                            for (x=1; x<=width; x++) {
+                                textBuffer[x][y + lines] = textBuffer[x][y];
+                                textColourBuffer[x][y + lines] = textColourBuffer[x][y];
+                                backColourBuffer[x][y + lines] = backColourBuffer[x][y];
+                            }
+                        } else {break;}
+                    }
+
+                    for (y=1; y<=lines; y++) {
+                        for (x=1; x<=width; x++) {
+                            textBuffer[x][y] = " ";
+                            textColourBuffer[x][y] = textColour;
+                            backColourBuffer[x][y] = backColour;
+                        }
+                    }
+                }
+
+                //Redraw screen
+                for (y = 1; y <= height; y++) {
+                    for (x = 1; x <= width; x++) {
+                        cursorX = x;
+                        cursorY = y;
+
+                        if (textColourBuffer[x] && textColourBuffer[x][y]) {
+                            textColour = textColourBuffer[x][y];
+                        } else {
+                            textColour = "#F0F0F0";
+                        }
+
+                        if (backColourBuffer[x] && backColourBuffer[x][y]) {
+                            backColour = backColourBuffer[x][y];
+                        } else {
+                            backColour = "#000000";
+                        }
+
+                        if (textBuffer[x] && textBuffer[x][y]) {
+                            cc_write(textBuffer[x][y]);
+                        } else {
+                            cc_write(" ");
+                        }
+                    }
+                }
             });
 
             socket.on("setTextColor", function (params) {
