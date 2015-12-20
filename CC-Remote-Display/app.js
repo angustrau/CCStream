@@ -106,7 +106,7 @@ app.get("/push", function(req, res) {
     }
 
     io.to(req.query.id).emit(req.query.op, req.query.param);
-    console.log("Operation '" + req.query.op + "' sent from id '" + req.query.id + "'");
+    console.log("Operation '" + req.query.op + "' sent from id '" + req.query.id + "' with parameter '" + req.query.param + "'");
     res.end("ok");
 })
 
