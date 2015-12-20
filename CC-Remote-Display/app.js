@@ -79,13 +79,6 @@ app.get("/push", function(req, res) {
             }    
 
             break;
-        case "setTextScale":
-            if (!req.query.param || typeof(req.query.param) != "string") {
-                res.status(400).send("Invalid parameter to 'setTextScale'");
-                return;    
-            }
-
-            break;
         case "setDisplaySize":
             if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1]) {
                 res.status(400).send("Invalid parameter to 'setCursorPos'");
