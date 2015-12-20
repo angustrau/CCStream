@@ -9,6 +9,10 @@
     <title>CC Remote Display</title>
 
     <style>
+        body, html {
+            margin: 0px;
+        }
+
         #display {
             position: fixed;
             top: 0;
@@ -96,7 +100,7 @@
         </div>
     </div>
 
-    <canvas id="display"></canvas>
+    <canvas id="display">Canvas is not supported on your browser!</canvas>
 
     <p></p>
 
@@ -110,6 +114,15 @@
             $('[data-toggle="popover"]').popover(); //Init popovers
         })
 
+        var canvas = document.getElementById("display");
+        canvas.width = window.innerWidth
+        canvas.height = window.innerHeight
+        $(window).resize(function () {
+            var canvas = document.getElementById("display");
+            canvas.width = window.innerWidth
+            canvas.height = window.innerHeight
+            draw();
+        });
 
         $("#options").on("hide.bs.modal", function () {
             //options close
@@ -264,6 +277,53 @@
             $("#cc-id").val(parameters["id"]);
             socket.emit("set id", parameters["id"]);
         }
+
+        //Load resources
+        var resources = {};
+
+        resources.normalCorners = new Image();
+        resources.normalCorners.src = "resources/corners.png";
+
+        resources.advancedCorners = new Image();
+        resources.advancedCorners.src = "resources/corners2.png";
+
+        resources.commandCorners = new Image();
+        resources.commandCorners.src = "resources/cornersCommand.png";
+
+        resources.font = new Image();
+        resources.font.src = "resources/termFont.png";
+
+        resources.turtleNormal = new Image();
+        resources.turtleNormal.src = "resources/turtle.png";
+
+        resources.turtleAdvanced = new Image();
+        resources.turtleAdvanced.src = "resources/turtle2.png";
+
+        //Draw
+        var screenX = 0;
+        var screenY = 0;
+
+        function draw() {
+            var canvas = document.getElementById("display");
+            var ctx = canvas.getContext("2d");
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            var screenPixelWidth = $("#cc-display-width").val();
+            var screenPixelHeight = $("#cc-display-height").val();
+
+            var screenPixelSize = Math.floor(Math.min(canvas.width / screenPixelWidth, canvas.height / screenPixelHeight));
+
+            var screenWidth = screenPixelSize * screenPixelWidth;
+            var screenHeight = screenPixelSize * screenPixelHeight;
+
+            screenX = (canvas.width - screenWidth) / 2;
+            screenY = (canvas.height - screenHeight) / 2;
+
+            //Draw the border
+
+        }
+        draw();
     </script>
 </body>
 </html>

@@ -118,6 +118,7 @@ app.get("/push", function(req, res) {
 })
 
 app.use("/js", express.static(__dirname + "/html/js"));
+app.use("/resources", express.static(__dirname + "/html/resources"));
 
 app.use(function(req, res) {
     //Redirect other urls to home
