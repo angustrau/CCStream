@@ -483,14 +483,14 @@
             });
 
             socket.on("setTextColor", function (params) {
-                textColour = colours[params];
+                textColour = colours[params] || "#F0F0F0";
             });
 
             socket.on("setBackgroundColor", function (params) {
                 if (params == "32768") {
                     backColour = "#000000"; //Replace black with a darker shade
                 } else {
-                    backColour = colours[params];
+                    backColour = colours[params] || "#000000";
                 }
             });
 
