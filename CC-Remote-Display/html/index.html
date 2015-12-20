@@ -110,6 +110,7 @@
             $('[data-toggle="popover"]').popover(); //Init popovers
         })
 
+
         $("#options").on("hide.bs.modal", function () {
             //options close
             $("#share-id").popover("hide"); //Close share popover
@@ -132,20 +133,17 @@
         saveOptions = function () {
             var id = $("#cc-id").val();
             if (oldOptions.id != id) {
-
+                window.history.pushState({ id: id }, document.title, "?id=" + id);
+                socket.emit("set id", id);
             }
             oldOptions.id = id;
 
             var width = $("#cc-display-width").val();
-            if (oldOptions.width != width) {
-
+            var height = $("#cc-display-height").val();
+            if (oldOptions.width != width || oldOptions.height != height) {
+                socket.emit("set size", { id: id, width: width, height: height });
             }
             oldOptions.width = width;
-
-            var height = $("#cc-display-height").val();
-            if (oldOptions.height != height) {
-
-            }
             oldOptions.height = height;
         }
 
@@ -161,7 +159,7 @@
             if (id == "") {
                 return "No ID selected...";
             } else {
-                return url + "?id=" + id + "/";
+                return url + "?id=" + id;
             }
         }
 
@@ -258,7 +256,10 @@
             parameters[kvPair[0]] = kvPair[1];
         });
 
-        if (parameters["id"]) {
+        if (history.state) {
+            $("#cc-id").val(history.state.id);
+            socket.emit("set id", history.state.id);
+        } else if (parameters["id"]) {
             //ID provided in url
             $("#cc-id").val(parameters["id"]);
             socket.emit("set id", parameters["id"]);

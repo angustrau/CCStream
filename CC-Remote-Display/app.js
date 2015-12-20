@@ -141,6 +141,10 @@ io.on("connection", function(socket) {
         connectedRooms[socket.id] = id;
         socket.join(id);
     });
+
+    socket.on("set size", function(params) {
+         console.log("Socket.io client '" + socket.id + "' has requested a display size change on id '" + params.id + "'");
+    });
 });
 
 http.setTimeout(0);
