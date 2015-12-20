@@ -19,7 +19,7 @@
             bottom: 50px;
             width: 100%;
             height: 100vh;
-            background-color: black;
+            background-color: yellow;
         }
 
         #optionsButton {
@@ -35,6 +35,15 @@
     <script src="js/jquery-2.1.4.min.js"></script>
     <script src="js/bootstrap/js/bootstrap.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
+
+    <div style="display: none">
+        <img id="normalCorners" src="resources/corners.png" />
+        <img id="advancedCorners" src="resources/corners2.png" />
+        <img id="commandCorners" src="resources/cornersCommand.png" />
+        <img id="termFont" src="resources/termFont.png" />
+        <img id="turtleNormal" src="resources/turtle.png" />
+        <img id="turtleAdvanced" src="resources/turtle2.png" />
+    </div>
 
     <div class="modal fade" id="options" tabindex="-1" role="dialog" aria-labelledby="optionsLabel">
         <div class="modal-dialog" role="document">
@@ -88,6 +97,12 @@
                             </div>
                         </div>
                     </div>
+
+                    <p></p>
+
+                    <button id="option-hide" type="button" class="btn btn-default" aria-pressed="false" onclick="if ($(this).hasClass('btn-danger')) { document.getElementById('optionsButton').style.display = ''; $(this).removeClass('btn-danger'); } else { document.getElementById('optionsButton').style.display = 'none'; $(this).addClass('btn-danger'); }">
+                        Hide Options
+                    </button>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -155,6 +170,7 @@
             var height = $("#cc-display-height").val();
             if (oldOptions.width != width || oldOptions.height != height) {
                 socket.emit("set size", { id: id, width: width, height: height });
+                draw();
             }
             oldOptions.width = width;
             oldOptions.height = height;
@@ -245,6 +261,8 @@
             height = Number(params[1]);
             oldOptions.height = height;
             $("#cc-display-height").val(height);
+
+            draw();
         });
 
         socket.on("allowSizeChange", function (params) {
@@ -259,6 +277,7 @@
 
         socket.on("setDisplayType", function (params) {
             displayType = params;
+            draw();
         });
 
         //Parse the url for parameters
@@ -281,25 +300,25 @@
         //Load resources
         var resources = {};
 
-        resources.normalCorners = new Image();
-        resources.normalCorners.src = "resources/corners.png";
+        resources.normalCorners = document.getElementById("normalCorners");
 
-        resources.advancedCorners = new Image();
-        resources.advancedCorners.src = "resources/corners2.png";
+        resources.advancedCorners = document.getElementById("advancedCorners");
 
-        resources.commandCorners = new Image();
-        resources.commandCorners.src = "resources/cornersCommand.png";
+        resources.commandCorners = document.getElementById("commandCorners");
 
-        resources.font = new Image();
-        resources.font.src = "resources/termFont.png";
+        resources.termFont = document.getElementById("termFont");
 
-        resources.turtleNormal = new Image();
-        resources.turtleNormal.src = "resources/turtle.png";
+        resources.turtleNormal = document.getElementById("turtleNormal");
 
-        resources.turtleAdvanced = new Image();
-        resources.turtleAdvanced.src = "resources/turtle2.png";
+        resources.turtleAdvanced = document.getElementById("turtleAdvanced");
 
         //Draw
+        $(window).load(function () {
+            var canvas = document.getElementById("display");
+            var ctx = canvas.getContext("2d");
+            ctx.imageSmoothingEnabled = false;
+        });
+
         var screenX = 0;
         var screenY = 0;
 
@@ -312,16 +331,62 @@
             var screenPixelWidth = $("#cc-display-width").val();
             var screenPixelHeight = $("#cc-display-height").val();
 
-            var screenPixelSize = Math.floor(Math.min(canvas.width / screenPixelWidth, canvas.height / screenPixelHeight));
+            var screenPixelSize = Math.floor(Math.min(canvas.width / (screenPixelWidth * 2), canvas.height / (screenPixelHeight * 3)));
 
-            var screenWidth = screenPixelSize * screenPixelWidth;
-            var screenHeight = screenPixelSize * screenPixelHeight;
+            var screenWidth = screenPixelSize * screenPixelWidth * 2;
+            var screenHeight = screenPixelSize * screenPixelHeight * 3;
 
-            screenX = (canvas.width - screenWidth) / 2;
-            screenY = (canvas.height - screenHeight) / 2;
+            screenX = Math.floor((canvas.width - screenWidth) / 2);
+            screenY = Math.floor((canvas.height - screenHeight) / 2);
 
             //Draw the border
+            switch (displayType) {
+                case "normal":
+                    ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                    ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                    ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                    ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                    ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                    ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                    ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                    ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                    break;
+                case "advanced":
+                    ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                    ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                    ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                    ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                    ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                    ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                    ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                    ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                    break;
+                case "command":
+                    ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                    ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                    ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                    ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                    ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                    ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                    ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                    ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                    break;
+                case "turtleNormal":
+                    //Not currently functional, use "normal"
+                    screenPixelWidth = 39;
+                    screenPixelHeight = 13;
 
+                    screenPixelSize = Math.min(canvas.width / 254, canvas.height / 217);
+
+                    var frameWidth = screenPixelSize * 254;
+                    var frameHeight = screenPixelSize * 217;
+
+                    var frameX = Math.floor((canvas.width - frameWidth) / 2);
+                    var frameY = Math.floor((canvas.height - frameHeight) / 2);
+
+                    ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
+                    break;
+            }
         }
         draw();
     </script>
