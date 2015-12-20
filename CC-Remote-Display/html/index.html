@@ -1,445 +1,609 @@
 ﻿<!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
-    <meta charset="utf-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>CC Remote Display</title>
+        <title>CC Remote Display</title>
 
-    <style>
-        body, html {
-            margin: 0px;
-        }
+        <style>
+            body, html {
+                margin: 0px;
+            }
 
-        #display {
-            position: fixed;
-            top: 0;
-            bottom: 50px;
-            width: 100%;
-            height: 100vh;
-            background-color: yellow;
-        }
+            #display {
+                position: fixed;
+                top: 0;
+                bottom: 50px;
+                width: 100%;
+                height: 100vh;
+                background-color: yellow;
+            }
 
-        #optionsButton {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-        }
-    </style>
+            #optionsButton {
+                position: fixed;
+                bottom: 10px;
+                left: 10px;
+            }
+        </style>
 
-    <link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-    <script src="js/jquery-2.1.4.min.js"></script>
-    <script src="js/bootstrap/js/bootstrap.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
+        <link href="js/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    </head>
+    <body>
+        <script src="js/jquery-2.1.4.min.js"></script>
+        <script src="js/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
 
-    <div style="display: none">
-        <img id="normalCorners" src="resources/corners.png" />
-        <img id="advancedCorners" src="resources/corners2.png" />
-        <img id="commandCorners" src="resources/cornersCommand.png" />
-        <img id="termFont" src="resources/termFont.png" />
-        <img id="turtleNormal" src="resources/turtle.png" />
-        <img id="turtleAdvanced" src="resources/turtle2.png" />
-    </div>
+        <div style="display: none">
+            <img id="normalCorners" src="resources/corners.png" />
+            <img id="advancedCorners" src="resources/corners2.png" />
+            <img id="commandCorners" src="resources/cornersCommand.png" />
+            <img id="termFont" src="resources/termFont.png"/>
+            <img id="turtleNormal" src="resources/turtle.png" />
+            <img id="turtleAdvanced" src="resources/turtle2.png" />
+        </div>
 
-    <div class="modal fade" id="options" tabindex="-1" role="dialog" aria-labelledby="optionsLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="optionsLabel">Options</h4>
-                </div>
-                <div class="modal-body">
-                    <label>ID</label>
-
-                    <div class="input-group">
-                        <input id="cc-id" type="text" class="form-control" placeholder="Enter ID to display..." />
-                        <span class="input-group-btn">
-                            <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The ID of the display you wish to show. Provided by your in-game ComputerCraft computer.">
-                                <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                            </button>
-
-                            <button id="share-id" type="button" class="btn btn-default" data-toggle="popover" data-container="body" data-placement="auto right" data-content="Loading..." onmouseover="document.getElementById('share-id').setAttribute('data-content', getShareLink());">
-                                <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
-                            </button>
-                        </span>
+        <div class="modal fade" id="options" tabindex="-1" role="dialog" aria-labelledby="optionsLabel">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title" id="optionsLabel">Options</h4>
                     </div>
+                    <div class="modal-body">
+                        <label>ID</label>
 
-                    <p></p>
+                        <div class="input-group">
+                            <input id="cc-id" type="text" class="form-control" placeholder="Enter ID to display..." />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The ID of the display you wish to show. Provided by your in-game ComputerCraft computer.">
+                                    <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                </button>
 
-                    <label>Display Size</label>
+                                <button id="share-id" type="button" class="btn btn-default" data-toggle="popover" data-container="body" data-placement="auto right" data-content="Loading..." onmouseover="document.getElementById('share-id').setAttribute('data-content', getShareLink());">
+                                    <span class="glyphicon glyphicon-share" aria-hidden="true"></span>
+                                </button>
+                            </span>
+                        </div>
 
-                    <div class="row">
-                        <div class="col-lg-6">
-                            <div class="input-group">
-                                <span class="input-group-addon">Width</span>
-                                <input id="cc-display-width" type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" value="51" oninput="$('#cc-display-width').val(Math.floor($('#cc-display-width').val()));" />
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The width of the display in pixels. Default is 51.">
-                                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                                    </button>
-                                </span>
+                        <p></p>
+
+                        <label>Display Size</label>
+
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Width</span>
+                                    <input id="cc-display-width" type="number" class="form-control" placeholder="Enter the width of the display..." step="1" min="1" value="51" oninput="$('#cc-display-width').val(Math.floor($('#cc-display-width').val()));" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The width of the display in pixels. Default is 51.">
+                                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                        </button>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon">Height</span>
+                                    <input id="cc-display-height" type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" value="19" oninput="$('#cc-display-height').val(Math.floor($('#cc-display-height').val()));" />
+                                    <span class="input-group-btn">
+                                        <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The height of the display in pixels. Default is 19.">
+                                            <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
+                                        </button>
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="col-lg-6">
-                            <div class="input-group">
-                                <span class="input-group-addon">Height</span>
-                                <input id="cc-display-height" type="number" class="form-control" placeholder="Enter the height of the display..." step="1" min="1" value="19" oninput="$('#cc-display-height').val(Math.floor($('#cc-display-height').val()));" />
-                                <span class="input-group-btn">
-                                    <button type="button" class="btn btn-default" data-toggle="popover" data-trigger="hover" data-container="body" data-placement="auto right" data-content="The height of the display in pixels. Default is 19.">
-                                        <span class="glyphicon glyphicon-question-sign" aria-hidden="true"></span>
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
+                        <p></p>
+
+                        <button id="option-hide" type="button" class="btn btn-default" aria-pressed="false" onclick="if ($(this).hasClass('btn-danger')) { document.getElementById('optionsButton').style.display = ''; $(this).removeClass('btn-danger'); } else { document.getElementById('optionsButton').style.display = 'none'; $(this).addClass('btn-danger'); }">
+                            Hide Options
+                        </button>
                     </div>
-
-                    <p></p>
-
-                    <button id="option-hide" type="button" class="btn btn-default" aria-pressed="false" onclick="if ($(this).hasClass('btn-danger')) { document.getElementById('optionsButton').style.display = ''; $(this).removeClass('btn-danger'); } else { document.getElementById('optionsButton').style.display = 'none'; $(this).addClass('btn-danger'); }">
-                        Hide Options
-                    </button>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveOptions();">
-                        <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
-                        Save & Close
-                    </button>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="saveOptions();">
+                            <span class="glyphicon glyphicon-save" aria-hidden="true"></span>
+                            Save & Close
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <canvas id="display">Canvas is not supported on your browser!</canvas>
+        <canvas id="display">Canvas is not supported on your browser!</canvas>
 
-    <p></p>
+        <p></p>
 
-    <button id="optionsButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#options" height="5%">
-        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-        Options
-    </button>
+        <button id="optionsButton" type="button" class="btn btn-primary" data-toggle="modal" data-target="#options" height="5%">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            Options
+        </button>
 
-    <script>
-        $(function () {
-            $('[data-toggle="popover"]').popover(); //Init popovers
-        })
+        <script>
+            $(function () {
+                $('[data-toggle="popover"]').popover(); //Init popovers
+            })
 
-        var canvas = document.getElementById("display");
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight
-        $(window).resize(function () {
             var canvas = document.getElementById("display");
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
-            draw();
-        });
+            $(window).resize(function () {
+                var canvas = document.getElementById("display");
+                canvas.width = window.innerWidth
+                canvas.height = window.innerHeight
+                draw();
+            });
 
-        $("#options").on("hide.bs.modal", function () {
-            //options close
-            $("#share-id").popover("hide"); //Close share popover
-        });
+            $("#options").on("hide.bs.modal", function () {
+                //options close
+                $("#share-id").popover("hide"); //Close share popover
+            });
 
-        $("#options").on("hidden.bs.modal", function () {
-            //options closed
-            revertOptions();
-        });
+            $("#options").on("hidden.bs.modal", function () {
+                //options closed
+                revertOptions();
+            });
 
-        $("#options").on("show.bs.modal", function () {
-            //options open
-            oldOptions.id = $("#cc-id").val();
-            oldOptions.width = $("#cc-display-width").val();
-            oldOptions.height = $("#cc-display-height").val();
-        });
+            $("#options").on("show.bs.modal", function () {
+                //options open
+                oldOptions.id = $("#cc-id").val();
+                oldOptions.width = $("#cc-display-width").val();
+                oldOptions.height = $("#cc-display-height").val();
+            });
 
-        var oldOptions = {}
+            var oldOptions = {}
 
-        saveOptions = function () {
-            var id = $("#cc-id").val();
-            if (oldOptions.id != id) {
-                window.history.pushState({ id: id }, document.title, "?id=" + id);
-                socket.emit("set id", id);
+            saveOptions = function () {
+                var id = $("#cc-id").val();
+                if (oldOptions.id != id) {
+                    window.history.pushState({ id: id }, document.title, "?id=" + id);
+                    socket.emit("set id", id);
+                }
+                oldOptions.id = id;
+
+                var width = $("#cc-display-width").val();
+                var height = $("#cc-display-height").val();
+                if (oldOptions.width != width || oldOptions.height != height) {
+                    socket.emit("set size", { id: id, width: width, height: height });
+                    draw();
+                }
+                oldOptions.width = width;
+                oldOptions.height = height;
             }
-            oldOptions.id = id;
+
+            revertOptions = function () {
+                $("#cc-id").val(oldOptions.id);
+                $("#cc-display-width").val(oldOptions.width);
+                $("#cc-display-height").val(oldOptions.height);
+            }
+
+            getShareLink = function() {
+                var id = document.getElementById("cc-id").value;
+                var url = window.location.href.split("?")[0];
+                if (id == "") {
+                    return "No ID selected...";
+                } else {
+                    return url + "?id=" + id;
+                }
+            }
+
+            processFont = function () {
+                colours.forEach(function (colour) {
+                    var buffer = document.createElement("canvas");
+                    var bufferctx = buffer.getContext("2d");
+                    bufferctx.get
+                });
+            }
+
+            var colours = {
+                "1": "#F0F0F0",
+                "2": "#F2B233",
+                "4": "#E57FD8",
+                "8": "#99B2F2",
+                "16": "#DEDE6C",
+                "32": "#7FCC19",
+                "64": "#F2B2CC",
+                "128": "#4C4C4C",
+                "256": "#999999",
+                "512": "#4C99B2",
+                "1024": "#B266E5",
+                "2048": "#3366CC",
+                "4096": "#7F664C",
+                "8192": "#57A64E",
+                "16384": "#CC4C4C",
+                "32768": "#191919"
+            };
+
+            var paintColours = {
+                "0": "#F0F0F0",
+                "1": "#F2B233",
+                "2": "#E57FD8",
+                "3": "#99B2F2",
+                "4": "#DEDE6C",
+                "5": "#7FCC19",
+                "6": "#F2B2CC",
+                "7": "#4C4C4C",
+                "8": "#999999",
+                "9": "#4C99B2",
+                "a": "#B266E5",
+                "b": "#3366CC",
+                "c": "#7F664C",
+                "d": "#57A64E",
+                "e": "#CC4C4C",
+                "f": "#191919"
+            };
+
+            var colouredFont = {};
+
+            var socket = io();
 
             var width = $("#cc-display-width").val();
             var height = $("#cc-display-height").val();
-            if (oldOptions.width != width || oldOptions.height != height) {
-                socket.emit("set size", { id: id, width: width, height: height });
-                draw();
+            var cursorX = 1;
+            var cursorY = 1;
+            var cursorBlink = false;
+            var lastBlinkX = 1;
+            var lastBlinkY = 1;
+            var textColour = "#F0F0F0";
+            var backColour = "#000000";
+            var fontSheet = document.getElementById("termFont");
+            var textBuffer = {};
+            var textColourBuffer = {};
+            var backColourBuffer = {};
+            var displayType = "normal";
+
+            function cc_write(text) {
+                var canvas = document.getElementById("display");
+                var ctx = canvas.getContext("2d");
+
+                text.replace(/\\n/g, "\n").split("").forEach(function (char) {
+                    if (char == "\n") {
+                        cursorX = 1;
+                        cursorY = cursorY + 1;
+                        return;
+                    }
+
+                    if (cursorX > width || cursorY > height) {
+                        return;
+                    }
+
+                    //Store char to buffer
+                    if (!textBuffer[cursorX]) textBuffer[cursorX] = {};
+                    textBuffer[cursorX][cursorY] = char;
+
+                    if (!textColourBuffer[cursorX]) textColourBuffer[cursorX] = {};
+                    textColourBuffer[cursorX][cursorY] = textColour;
+
+                    if (!backColourBuffer[cursorX]) backColourBuffer[cursorX] = {};
+                    backColourBuffer[cursorX][cursorY] = backColour;
+
+                    ctx.globalCompositeOperation = "source-over";
+                    ctx.clearRect(screenX + (cursorX - 1) * screenPixelSize * 2, screenY + (cursorY - 1) * screenPixelSize * 3, screenPixelSize * 2, screenPixelSize * 3)
+
+                    //Draw text
+                    var charCode = char.charCodeAt(0);
+                    ctx.drawImage(fontSheet, (charCode % 16) * 6, Math.floor(charCode / 16) * 9, 6, 9, screenX + (cursorX - 1) * screenPixelSize * 2, screenY + (cursorY - 1) * screenPixelSize * 3, screenPixelSize * 2, screenPixelSize * 3);
+
+                    //Colourise text
+                    ctx.globalCompositeOperation = "source-atop";
+                    ctx.fillStyle = textColour;
+                    ctx.fillRect(screenX + (cursorX - 1) * screenPixelSize * 2, screenY + (cursorY - 1) * screenPixelSize * 3, screenPixelSize * 2, screenPixelSize * 3);
+
+                    //Draw background
+                    ctx.globalCompositeOperation = "destination-over"
+                    ctx.fillStyle = backColour;
+                    ctx.fillRect(screenX + (cursorX - 1) * screenPixelSize * 2, screenY + (cursorY - 1) * screenPixelSize * 3, screenPixelSize * 2, screenPixelSize * 3);
+
+                    cursorX = cursorX + 1;
+                });
             }
-            oldOptions.width = width;
-            oldOptions.height = height;
-        }
-
-        revertOptions = function () {
-            $("#cc-id").val(oldOptions.id);
-            $("#cc-display-width").val(oldOptions.width);
-            $("#cc-display-height").val(oldOptions.height);
-        }
-
-        getShareLink = function() {
-            var id = document.getElementById("cc-id").value;
-            var url = window.location.href.split("?")[0];
-            if (id == "") {
-                return "No ID selected...";
-            } else {
-                return url + "?id=" + id;
-            }
-        }
-
-        var colours = {
-            "1": "#F0F0F0",
-            "2": "#F2B233",
-            "4": "#E57FD8",
-            "8": "#99B2F2",
-            "16": "#DEDE6C",
-            "32": "#7FCC19",
-            "64": "#F2B2CC",
-            "128": "#4C4C4C",
-            "256": "#999999",
-            "512": "#4C99B2",
-            "1024": "#B266E5",
-            "2048": "#3366CC",
-            "4096": "#7F664C",
-            "8192": "#57A64E",
-            "16384": "#CC4C4C",
-            "32768": "#191919"
-        };
-
-        var socket = io();
-
-        var width = $("#cc-display-width").val();
-        var height = $("#cc-display-height").val();
-        var cursorX = 1;
-        var cursorY = 1;
-        var cursorBlink = false;
-        var lastBlinkX = 1;
-        var lastBlinkY = 1;
-        var textColour = "#F0F0F0";
-        var backColour = "#000000";
-        var textBuffer = {};
-        var textColourBuffer = {};
-        var backColourBuffer = {};
-        var displayType = "normal";
-
-        function cc_write(text) {
-            var canvas = document.getElementById("display");
-            var ctx = canvas.getContext("2d");
-
-            var characters = text.split("");
-            characters.forEach(function (char) {
-                if (char == "\n") {
-                    cursorX = 1;
-                    cursorY = cursorY + 1;
-                    return;
-                }
-
-                if (cursorX > width || cursorY > height) {
-                    return;
-                }
-
-                if (!textBuffer[cursorX]) textBuffer[cursorX] = {};
-                textBuffer[cursorX][cursorY] = char;
-
-                if (!textColourBuffer[cursorX]) textColourBuffer[cursorX] = {};
-                textColourBuffer[cursorX][cursorY] = textColour;
-
-                cursorX = cursorX + 1;
+            socket.on("write", function (params) {
+                cc_write(params);
             });
-        }
-        socket.on("write", function (params) {
 
-        });
+            socket.on("blit", function (params) {
+                var text = params[0].replace(/\\n/g, "\n").split("");
+                var textColours = params[1].replace(/ /g, "0").split("");
+                var backColours = params[2].replace(/ /g, "f").split("");
 
-        socket.on("blit", function (params) {
+                for (i = 0; i < Math.min(text.length, textColours.length, backColours.length) ; i++) {
+                    textColour = paintColours[textColours[i]];
+                    backColour = paintColours[backColours[i]];
+                    if (backColours[i] == "f") backColour = "#000000";
 
-        });
+                    cc_write(text[i]);
+                }
+            });
 
-        socket.on("clear", function (params) {
+            function cc_clear() {
+                var oldCursorX = cursorX;
+                var oldCursorY = cursorY;
 
-        });
+                cursorX = 1;
+                cursorY = 1;
 
-        socket.on("clearLine", function (params) {
+                cc_write((" ".repeat(width) + "\n").repeat(height));
 
-        });
-
-        socket.on("setCursorPos", function (params) {
-            cursorX = Number(params[0]);
-            cursorY = Number(params[1]);
-        });
-
-        function blinkCursor() {
-
-        }
-
-        socket.on("setCursorBlink", function (params) {
-            if (params == "true") {
-                cursorBlink = true;
-            } else if (params == "false") {
-                cursorBlink = false;
+                cursorX = oldCursorX;
+                cursorY = oldCursorY;
             }
-        });
 
-        socket.on("scroll", function (params) {
+            socket.on("clear", function (params) {
+                cc_clear();
+            });
 
-        });
+            socket.on("clearLine", function (params) {
+                oldCursorX = cursorX;
 
-        socket.on("setTextColor", function (params) {
-            textColour = colours[params];
-        });
+                cursorX = 1;
 
-        socket.on("setBackgroundColor", function (params) {
-            if (params == "32768") {
-                backColour = "#000000"; //Replace black with a darker shade
-            } else {
-                backColour = colours[params];
+                cc_write(" ".repeat(width));
+
+                cursorX = oldCursorX;
+            });
+
+            socket.on("setCursorPos", function (params) {
+                cursorX = Number(params[0]);
+                cursorY = Number(params[1]);
+            });
+
+            function blinkCursorOn() {
+                if (cursorBlink) {
+                    lastBlinkX = cursorX;
+                    lastBlinkY = cursorY;
+
+                    var canvas = document.getElementById("display");
+                    var ctx = canvas.getContext("2d");
+
+                    ctx.globalCompositeOperation = "source-over";
+
+                    ctx.fillStyle = textColour;
+                    ctx.fillRect(screenX + (cursorX - 5/6) * screenPixelSize * 2, screenY + (cursorY - 1/9) * screenPixelSize * 3, screenPixelSize * 1.6, screenPixelSize / 9 * 3);
+
+                    setTimeout(function() { blinkCursorOff(); }, 1000);
+                }
             }
-        });
 
-        socket.on("setDisplaySize", function (params) {
-            width = Number(params[0]);
-            oldOptions.width = width;
-            $("#cc-display-width").val(width);
+            function blinkCursorOff() {
+                var oldCursorX = cursorX;
+                var oldCursorY = cursorY;
+                var oldTextColour = textColour;
+                var oldBackColour = backColour;
 
-            height = Number(params[1]);
-            oldOptions.height = height;
-            $("#cc-display-height").val(height);
+                cursorX = lastBlinkX;
+                cursorY = lastBlinkY;
 
+                if (textColourBuffer[cursorX]) {
+                    textColour = textColourBuffer[cursorX][cursorY] || "#F0F0F0";
+                } else {
+                    textColour = "#F0F0F0";
+                }
+
+                if (backColourBuffer[cursorX]) {
+                    backColour = backColourBuffer[cursorX][cursorY] || "#000000";
+                } else {
+                    backColour = "#000000";
+                }
+
+                if (textBuffer[cursorX] && textBuffer[cursorX][cursorY]) {
+                    cc_write(textBuffer[cursorX][cursorY]);
+                } else {
+                    cc_write(" ");
+                }
+
+                cursorX = oldCursorX;
+                cursorY = oldCursorY;
+                textColour = oldTextColour;
+                backColour = oldBackColour;
+
+                setTimeout(function () { blinkCursorOn(); }, 1000);
+            }
+
+            socket.on("setCursorBlink", function (params) {
+                if (params == "true") {
+                    cursorBlink = true;
+                    blinkCursorOn();
+                } else if (params == "false") {
+                    cursorBlink = false;
+                }
+            });
+
+            socket.on("scroll", function (params) {
+
+            });
+
+            socket.on("setTextColor", function (params) {
+                textColour = colours[params];
+            });
+
+            socket.on("setBackgroundColor", function (params) {
+                if (params == "32768") {
+                    backColour = "#000000"; //Replace black with a darker shade
+                } else {
+                    backColour = colours[params];
+                }
+            });
+
+            socket.on("setDisplaySize", function (params) {
+                width = Number(params[0]);
+                oldOptions.width = width;
+                $("#cc-display-width").val(width);
+
+                height = Number(params[1]);
+                oldOptions.height = height;
+                $("#cc-display-height").val(height);
+
+                draw();
+            });
+
+            socket.on("allowSizeChange", function (params) {
+                if (params == "true") {
+                    $("#cc-display-width").prop("readonly", false);
+                    $("#cc-display-height").prop("readonly", false);
+                } else if (params == "false") {
+                    $("#cc-display-width").prop("readonly", true);
+                    $("#cc-display-height").prop("readonly", true);
+                }
+            });
+
+            socket.on("setDisplayType", function (params) {
+                displayType = params;
+                draw();
+            });
+
+            //Parse the url for parameters
+            var parameters = {}
+            window.location.search.substring(1).split("&").forEach(function (v) {
+                var kvPair = v.split("=");
+                if (!kvPair[1]) return;
+                parameters[kvPair[0]] = kvPair[1];
+            });
+
+            if (history.state) {
+                $("#cc-id").val(history.state.id);
+                socket.emit("set id", history.state.id);
+            } else if (parameters["id"]) {
+                //ID provided in url
+                $("#cc-id").val(parameters["id"]);
+                socket.emit("set id", parameters["id"]);
+            }
+
+            //Load resources
+            var resources = {};
+
+            resources.normalCorners = document.getElementById("normalCorners");
+
+            resources.advancedCorners = document.getElementById("advancedCorners");
+
+            resources.commandCorners = document.getElementById("commandCorners");
+
+            resources.termFont = document.getElementById("termFont");
+
+            resources.turtleNormal = document.getElementById("turtleNormal");
+
+            resources.turtleAdvanced = document.getElementById("turtleAdvanced");
+
+            //Draw
+            $(window).load(function () {
+                var canvas = document.getElementById("display");
+                var ctx = canvas.getContext("2d");
+                ctx.imageSmoothingEnabled = false;
+            });
+
+            var screenX = 0;
+            var screenY = 0;
+            var screenPixelSize = 1;
+
+            function draw() {
+                var canvas = document.getElementById("display");
+                var ctx = canvas.getContext("2d");
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                var screenPixelWidth = $("#cc-display-width").val();
+                var screenPixelHeight = $("#cc-display-height").val();
+
+                screenPixelSize = Math.floor(Math.min(canvas.width / (screenPixelWidth * 2), canvas.height / (screenPixelHeight * 3)));
+
+                var screenWidth = screenPixelSize * screenPixelWidth * 2;
+                var screenHeight = screenPixelSize * screenPixelHeight * 3;
+
+                screenX = Math.floor((canvas.width - screenWidth) / 2);
+                screenY = Math.floor((canvas.height - screenHeight) / 2);
+
+                //Draw the border
+                switch (displayType) {
+                    case "normal":
+                        ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                        ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                        ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                        ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                        ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                        ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                        ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                        ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                        break;
+                    case "advanced":
+                        ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                        ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                        ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                        ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                        ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                        ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                        ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                        ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                        break;
+                    case "command":
+                        ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
+                        ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
+                        ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
+                        ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
+                        ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
+                        ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
+                        ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
+                        ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
+                        break;
+                    case "turtleNormal":
+                        //Not currently functional, use "normal"
+                        screenPixelWidth = 39;
+                        screenPixelHeight = 13;
+
+                        screenPixelSize = Math.min(canvas.width / 254, canvas.height / 217);
+
+                        var frameWidth = screenPixelSize * 254;
+                        var frameHeight = screenPixelSize * 217;
+
+                        var frameX = Math.floor((canvas.width - frameWidth) / 2);
+                        var frameY = Math.floor((canvas.height - frameHeight) / 2);
+
+                        ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
+                        break;
+                }
+
+                var oldCursorX = cursorX;
+                var oldCursorY = cursorY;
+                var oldBackColour = backColour;
+
+                //Draw the background
+                cursorX = 1;
+                cursorY = 1;
+
+                //Draw pixels
+                for (y = 1; y <= height; y++) {
+                    for (x = 1; x <= width; x++) {
+                        cursorX = x;
+                        cursorY = y;
+
+                        if (textColourBuffer[x] && textColourBuffer[x][y]) {
+                            textColour = textColourBuffer[x][y];
+                        } else {
+                            textColour = "#F0F0F0";
+                        }
+
+                        if (backColourBuffer[x] && backColourBuffer[x][y]) {
+                            backColour = backColourBuffer[x][y];
+                        } else {
+                            backColour = "#000000";
+                        }
+
+                        if (textBuffer[x] && textBuffer[x][y]) {
+                            cc_write(textBuffer[x][y]);
+                        } else {
+                            cc_write(" ");
+                        }
+                    }
+                }
+
+                cursorX = oldCursorX;
+                cursorY = oldCursorY;
+                backColour = oldBackColour;
+            }
             draw();
-        });
-
-        socket.on("allowSizeChange", function (params) {
-            if (params == "true") {
-                $("#cc-display-width").prop("readonly", false);
-                $("#cc-display-height").prop("readonly", false);
-            } else if (params == "false") {
-                $("#cc-display-width").prop("readonly", true);
-                $("#cc-display-height").prop("readonly", true);
-            }
-        });
-
-        socket.on("setDisplayType", function (params) {
-            displayType = params;
-            draw();
-        });
-
-        //Parse the url for parameters
-        var parameters = {}
-        window.location.search.substring(1).split("&").forEach(function (v) {
-            var kvPair = v.split("=");
-            if (!kvPair[1]) return;
-            parameters[kvPair[0]] = kvPair[1];
-        });
-
-        if (history.state) {
-            $("#cc-id").val(history.state.id);
-            socket.emit("set id", history.state.id);
-        } else if (parameters["id"]) {
-            //ID provided in url
-            $("#cc-id").val(parameters["id"]);
-            socket.emit("set id", parameters["id"]);
-        }
-
-        //Load resources
-        var resources = {};
-
-        resources.normalCorners = document.getElementById("normalCorners");
-
-        resources.advancedCorners = document.getElementById("advancedCorners");
-
-        resources.commandCorners = document.getElementById("commandCorners");
-
-        resources.termFont = document.getElementById("termFont");
-
-        resources.turtleNormal = document.getElementById("turtleNormal");
-
-        resources.turtleAdvanced = document.getElementById("turtleAdvanced");
-
-        //Draw
-        $(window).load(function () {
-            var canvas = document.getElementById("display");
-            var ctx = canvas.getContext("2d");
-            ctx.imageSmoothingEnabled = false;
-        });
-
-        var screenX = 0;
-        var screenY = 0;
-        var screenPixelSize = 1;
-
-        function draw() {
-            var canvas = document.getElementById("display");
-            var ctx = canvas.getContext("2d");
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            var screenPixelWidth = $("#cc-display-width").val();
-            var screenPixelHeight = $("#cc-display-height").val();
-
-            screenPixelSize = Math.floor(Math.min(canvas.width / (screenPixelWidth * 2), canvas.height / (screenPixelHeight * 3)));
-
-            var screenWidth = screenPixelSize * screenPixelWidth * 2;
-            var screenHeight = screenPixelSize * screenPixelHeight * 3;
-
-            screenX = Math.floor((canvas.width - screenWidth) / 2);
-            screenY = Math.floor((canvas.height - screenHeight) / 2);
-
-            //Draw the border
-            switch (displayType) {
-                case "normal":
-                    ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
-                    ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
-                    ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
-                    ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
-                    ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
-                    ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
-                    ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
-                    ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
-                    break;
-                case "advanced":
-                    ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
-                    ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
-                    ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
-                    ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
-                    ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
-                    ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
-                    ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
-                    ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
-                    break;
-                case "command":
-                    ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, screenX - 12, screenY, 12, screenHeight); //Left
-                    ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, screenX + screenWidth, screenY, 12, screenHeight); //Right
-                    ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, screenX, screenY - 12, screenWidth, 12); //Top
-                    ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, screenX, screenY + screenHeight, screenWidth, 12); //Bottom
-                    ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, screenX - 12, screenY - 12, 12, 12); //Top-Left
-                    ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, screenX + screenWidth, screenY - 12, 12, 12); //Top-Right
-                    ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, screenX - 12, screenY + screenHeight, 12, 12); //Bottom-Left
-                    ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, screenX + screenWidth, screenY + screenHeight, 12, 12); //Bottom-Right
-                    break;
-                case "turtleNormal":
-                    //Not currently functional, use "normal"
-                    screenPixelWidth = 39;
-                    screenPixelHeight = 13;
-
-                    screenPixelSize = Math.min(canvas.width / 254, canvas.height / 217);
-
-                    var frameWidth = screenPixelSize * 254;
-                    var frameHeight = screenPixelSize * 217;
-
-                    var frameX = Math.floor((canvas.width - frameWidth) / 2);
-                    var frameY = Math.floor((canvas.height - frameHeight) / 2);
-
-                    ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
-                    break;
-            }
-
-            //Draw the background
-        }
-        draw();
-    </script>
-</body>
+        </script>
+    </body>
 </html>
