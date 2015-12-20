@@ -192,6 +192,25 @@
             }
         }
 
+        var colours = {
+            "1": "#F0F0F0",
+            "2": "#F2B233",
+            "4": "#E57FD8",
+            "8": "#99B2F2",
+            "16": "#DEDE6C",
+            "32": "#7FCC19",
+            "64": "#F2B2CC",
+            "128": "#4C4C4C",
+            "256": "#999999",
+            "512": "#4C99B2",
+            "1024": "#B266E5",
+            "2048": "#3366CC",
+            "4096": "#7F664C",
+            "8192": "#57A64E",
+            "16384": "#CC4C4C",
+            "32768": "#191919"
+        };
+
         var socket = io();
 
         var width = $("#cc-display-width").val();
@@ -201,13 +220,38 @@
         var cursorBlink = false;
         var lastBlinkX = 1;
         var lastBlinkY = 1;
-        var textColour = 1;
-        var backColour = 32768;
+        var textColour = "#F0F0F0";
+        var backColour = "#000000";
         var textBuffer = {};
-        var textColorBuffer = {};
-        var backColorBuffer = {};
+        var textColourBuffer = {};
+        var backColourBuffer = {};
         var displayType = "normal";
 
+        function cc_write(text) {
+            var canvas = document.getElementById("display");
+            var ctx = canvas.getContext("2d");
+
+            var characters = text.split("");
+            characters.forEach(function (char) {
+                if (char == "\n") {
+                    cursorX = 1;
+                    cursorY = cursorY + 1;
+                    return;
+                }
+
+                if (cursorX > width || cursorY > height) {
+                    return;
+                }
+
+                if (!textBuffer[cursorX]) textBuffer[cursorX] = {};
+                textBuffer[cursorX][cursorY] = char;
+
+                if (!textColourBuffer[cursorX]) textColourBuffer[cursorX] = {};
+                textColourBuffer[cursorX][cursorY] = textColour;
+
+                cursorX = cursorX + 1;
+            });
+        }
         socket.on("write", function (params) {
 
         });
@@ -246,11 +290,15 @@
         });
 
         socket.on("setTextColor", function (params) {
-            textColour = Number(params);
+            textColour = colours[params];
         });
 
         socket.on("setBackgroundColor", function (params) {
-            backColour = Number(params);
+            if (params == "32768") {
+                backColour = "#000000"; //Replace black with a darker shade
+            } else {
+                backColour = colours[params];
+            }
         });
 
         socket.on("setDisplaySize", function (params) {
@@ -321,6 +369,7 @@
 
         var screenX = 0;
         var screenY = 0;
+        var screenPixelSize = 1;
 
         function draw() {
             var canvas = document.getElementById("display");
@@ -331,7 +380,7 @@
             var screenPixelWidth = $("#cc-display-width").val();
             var screenPixelHeight = $("#cc-display-height").val();
 
-            var screenPixelSize = Math.floor(Math.min(canvas.width / (screenPixelWidth * 2), canvas.height / (screenPixelHeight * 3)));
+            screenPixelSize = Math.floor(Math.min(canvas.width / (screenPixelWidth * 2), canvas.height / (screenPixelHeight * 3)));
 
             var screenWidth = screenPixelSize * screenPixelWidth * 2;
             var screenHeight = screenPixelSize * screenPixelHeight * 3;
@@ -387,6 +436,8 @@
                     ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
                     break;
             }
+
+            //Draw the background
         }
         draw();
     </script>

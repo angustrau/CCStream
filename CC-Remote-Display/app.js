@@ -34,7 +34,7 @@ app.get("/push", function(req, res) {
 
             break;
         case "blit":
-            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1] || !req.query.param[2] || req.query.param[0].length != req.query.param[1].length || req.query.param[0].length != req.query.param[2].length) {
+            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1] || !req.query.param[2]) {
                 res.status(400).send("Invalid parameter to 'blit'");
                 return;    
             }
