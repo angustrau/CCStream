@@ -1,0 +1,137 @@
+local server = "http://127.0.0.1:5678"
+
+local ospullevent = os.pullEvent
+--os.pullEvent = os.pullEventRaw
+
+--local id = os.getComputerID()..": "..os.getComputerLabel() or "Default"
+local id = 9
+print(id)
+local hooks = {};
+
+local function urlEncode(text)
+	return string.gsub(text, " ", "%%20")
+end
+
+local oldwrite = term.write
+local pushQueue = {};
+local function push(op, parameter)
+	pushQueue[#pushQueue + 1] = {op, parameter}
+end
+local function processPushQueue()
+	while true do
+		local queue = pushQueue
+		pushQueue = {}
+
+		if #queue > 0 then
+			local address = server.."/push?id="..id.."&queryLength=10"
+			for i=1, #queue do
+				address = address.."&op["..tostring(i%10).."]="..queue[i][1].."&param["..tostring(i%10).."]="..urlEncode(textutils.serializeJSON(queue[i][2] or {}))
+
+				if i%10 == 0 or i==#queue then
+					http.get(address)
+					address = server.."/push?id="..id.."&queryLength=5"
+					if #queue - i < 10 then address = server.."/push?id="..id.."&queryLength="..tostring(#queue - i) end
+				end
+			end
+		end
+
+		--[[
+		for i=1, #queue do
+			local op = queue[i][1]
+			local parameter = queue[i][2]
+
+			if not parameter then
+				http.get(urlEncode(server.."/push?id="..id.."&op="..op))
+			elseif type(parameter) == "string" then
+				http.get(urlEncode(server.."/push?id="..id.."&op="..op.."&param="..parameter))
+			elseif type(parameter) == "table" then
+				local address = server.."/push?id="..id.."&op="..op
+
+				for i=0, #parameter - 1 do
+					address = address.."&param["..i.."]="..parameter[i+1]
+				end
+
+				http.get(urlEncode(address))
+			end
+		end
+		--]]
+		sleep(1)
+	end
+end
+
+local termwrite = term.write
+function term.write(text)
+	push("write", text or " ")
+	termwrite(text)
+end
+
+local termblit = term.blit
+function term.blit(text, textColour, backColour)
+	push("blit", {text, textColour, backColour})
+
+	termblit(text, textColour, backColour)
+end
+
+local termclear = term.clear
+function term.clear()
+	push("clear")
+
+	termclear()
+end
+
+local termclearline = term.clearLine
+function term.clearLine()
+	push("clearLine")
+
+	termclearline()
+end
+
+local termsetcursorpos = term.setCursorPos
+function term.setCursorPos(x, y)
+	push("setCursorPos", {tostring(x), tostring(y)})
+
+	termsetcursorpos(x, y)
+end
+
+local termsetcursorblink = term.setCursorBlink
+function term.setCursorBlink(blink)
+	push("setCursorBlink", tostring(blink))
+
+	termsetcursorblink(blink)
+end
+
+local termscroll = term.scroll
+function term.scroll(lines)
+	push("scroll", tostring(lines))
+
+	termscroll(lines)
+end
+
+local termsettextcolor = term.setTextColor
+function term.setTextColor(colour)
+	push("setTextColor", tostring(colour))
+
+	termsettextcolor(colour)
+end
+term.setTextColour = term.setTextColor
+
+local termsetbackgroundcolor = term.setBackgroundColor
+function term.setBackgroundColor(colour)
+	push("setBackgroundColor", tostring(colour))
+
+	termsetbackgroundcolor(colour)
+end
+term.setBackgroundColour = term.setBackgroundColor
+
+local textScale = 1
+function term.setTextScale(scale)
+	local width, height = term.getSize()
+	local newWidth = width * (textScale / scale)
+
+	push("setDisplaySize", {width, height})
+
+	--To do
+end
+
+
+parallel.waitForAny(function() processPushQueue() end, function() shell.run("shell") end)
