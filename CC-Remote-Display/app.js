@@ -14,27 +14,33 @@ app.get("/pull", function(req, res) {
 })
 
 app.get("/push", function(req, res) {
+    console.log(req.query);
     if (!req.query.id) {
         res.status(400).send("No ID");
         return;
     }
-    
-    if (!req.query.op) {
+    for (i=0;i<Number(req.query.queryLength);i++) {
+    var op=req.query.op[i];
+    var param = JSON.parse(req.query.param[i]);
+    if (param.length == 1) param = param[0];
+
+    if (!op) {
         res.status(400).send("No operation");
         return;
     }
 
     //Check for valid parameters
-    switch(req.query.op) {
+    switch("clear") {
         case "write":
-            if (!req.query.param || typeof(req.query.param) != "string") {
+            if (!param || typeof(param) != "string") {
                 res.status(400).send("Invalid parameter to 'write'");
+                console.log("Failed writing '" + param + "'");
                 return;    
             }
 
             break;
         case "blit":
-            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1] || !req.query.param[2]) {
+            if (!param || typeof(param) != "object" || !param[0] || !param[1] || !param[2]) {
                 res.status(400).send("Invalid parameter to 'blit'");
                 return;    
             }
@@ -45,56 +51,56 @@ app.get("/push", function(req, res) {
         case "clearLine":
             break;
         case "setCursorPos":
-            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1]) {
+            if (!param || typeof(param) != "object" || !param[0] || !param[1]) {
                 res.status(400).send("Invalid parameter to 'setCursorPos'");
                 return;    
             }
 
             break;
         case "setCursorBlink":
-            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "true" || req.query.param == "false")) {
+            if (!param || typeof(param) != "string" || !(param == "true" || param == "false")) {
                 res.status(400).send("Invalid parameter to 'setCursorBlink'");
                 return;    
             }
 
             break;
         case "scroll":
-            if (!req.query.param || typeof(req.query.param) != "string") {
+            if (!param || typeof(param) != "string") {
                 res.status(400).send("Invalid parameter to 'scroll'");
                 return;    
             }
 
             break;
         case "setTextColor":
-            if (!req.query.param || typeof(req.query.param) != "string") {
+            if (!param || typeof(param) != "string") {
                 res.status(400).send("Invalid parameter to 'setTextColor'");
                 return;    
             }
 
             break;
         case "setBackgroundColor":
-            if (!req.query.param || typeof(req.query.param) != "string") {
+            if (!param || typeof(param) != "string") {
                 res.status(400).send("Invalid parameter to 'setBackgroundColor'");
                 return;    
             }    
 
             break;
         case "setDisplaySize":
-            if (!req.query.param || typeof(req.query.param) != "object" || !req.query.param[0] || !req.query.param[1]) {
+            if (!param || typeof(param) != "object" || !param[0] || !param[1]) {
                 res.status(400).send("Invalid parameter to 'setCursorPos'");
                 return;    
             }
 
             break;
         case "allowSizeChange":
-            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "true" || req.query.param == "false")) {
+            if (!param || typeof(param) != "string" || !(param == "true" || param == "false")) {
                 res.status(400).send("Invalid parameter to 'allowSizeChange'");
                 return;    
             }
 
             break;
         case "setDisplayType":
-            if (!req.query.param || typeof(req.query.param) != "string" || !(req.query.param == "normal" || req.query.param == "advanced" || req.query.param == "command" || req.query.param == "turtleNormal" || req.query.param == "turtleAdvanced")) {
+            if (!param || typeof(param) != "string" || !(param == "normal" || param == "advanced" || param == "command" || param == "turtleNormal" || param == "turtleAdvanced")) {
                 res.status(400).send("Invalid parameter to 'setDisplayType'");
                 return;
             } 
@@ -105,9 +111,10 @@ app.get("/push", function(req, res) {
             return;
     }
 
-    io.to(req.query.id).emit(req.query.op, req.query.param);
-    console.log("Operation '" + req.query.op + "' sent from id '" + req.query.id + "' with parameter '" + req.query.param + "'");
-    res.end("ok");
+    io.to(req.query.id).emit(op, param);
+    console.log("Operation '" + op + "' sent from id '" + req.query.id + "' with parameter '" + param + "'");
+    }
+    res.send("ok");
 })
 
 app.use("/js", express.static(__dirname + "/html/js"));
