@@ -364,9 +364,9 @@
 
                     ctx.fillStyle = textColour;
                     ctx.fillRect(screenX + (cursorX - 5/6) * screenPixelSize * 2, screenY + (cursorY - 1/9) * screenPixelSize * 3, screenPixelSize * 1.6, screenPixelSize / 9 * 3);
-
-                    setTimeout(function() { blinkCursorOff(); }, 1000);
                 }
+
+                setTimeout(function() { blinkCursorOff(); }, 1000);
             }
 
             function blinkCursorOff() {
@@ -403,11 +403,11 @@
 
                 setTimeout(function () { blinkCursorOn(); }, 1000);
             }
+            blinkCursorOn();
 
             socket.on("setCursorBlink", function (params) {
                 if (params == "true") {
                     cursorBlink = true;
-                    blinkCursorOn();
                 } else if (params == "false") {
                     cursorBlink = false;
                 }
@@ -415,6 +415,8 @@
 
             socket.on("scroll", function (params) {
                 var lines = Number(params);
+                var oldCursorX = cursorX;
+                var oldCursorY = cursorY;
 
                 //Shift lines down or up
                 if (lines > 0) {
@@ -480,6 +482,9 @@
                         }
                     }
                 }
+
+                cursorX = oldCursorX;
+                cursorY = oldCursorY;
             });
 
             socket.on("setTextColor", function (params) {
