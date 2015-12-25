@@ -83,6 +83,7 @@ Term = function (canvasObj, showBorder) {
 
     //Get canvas context
 	var this.ctx = this.canvas.getContext("2d");
+	ctx.imageSmoothingEnabled = false;
 
 	this.width = 51;
 	this.height = 19;
