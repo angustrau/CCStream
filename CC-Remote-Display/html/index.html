@@ -257,7 +257,9 @@
             var backColourBuffer = {};
             var displayType = "normal";
 
-            function cc_write(text) {
+            var term = {};
+
+            function term.write(text) {
                 var canvas = document.getElementById("display");
                 var ctx = canvas.getContext("2d");
 
@@ -302,54 +304,67 @@
                     cursorX = cursorX + 1;
                 });
             }
+
             socket.on("write", function (params) {
-                cc_write(params);
+                term.write(params);
             });
+
+            function term.blit(text, textColours, backColours) {
+                for (i = 0; i < Math.min(text.length, textColours.length, backColours.length) ; i++) {
+                    textColour = paintColours[textColours[i]];
+                    backColour = paintColours[backColours[i]];
+                    if (backColours[i] == "f") backColour = "#000000";
+
+                    term.write(text[i]);
+                }
+            }
 
             socket.on("blit", function (params) {
                 var text = params[0].replace(/\\n/g, "\n").split("");
                 var textColours = params[1].replace(/ /g, "0").split("");
                 var backColours = params[2].replace(/ /g, "f").split("");
 
-                for (i = 0; i < Math.min(text.length, textColours.length, backColours.length) ; i++) {
-                    textColour = paintColours[textColours[i]];
-                    backColour = paintColours[backColours[i]];
-                    if (backColours[i] == "f") backColour = "#000000";
-
-                    cc_write(text[i]);
-                }
+                term.blit(text, textColours, backColours);
             });
 
-            function cc_clear() {
+            function term.clear() {
                 var oldCursorX = cursorX;
                 var oldCursorY = cursorY;
 
                 cursorX = 1;
                 cursorY = 1;
 
-                cc_write((" ".repeat(width) + "\n").repeat(height));
+                term.write((" ".repeat(width) + "\n").repeat(height));
 
                 cursorX = oldCursorX;
                 cursorY = oldCursorY;
             }
 
             socket.on("clear", function (params) {
-                cc_clear();
+                term.clear();
             });
 
-            socket.on("clearLine", function (params) {
+            function term.clearLine() {
                 oldCursorX = cursorX;
 
                 cursorX = 1;
 
-                cc_write(" ".repeat(width));
+                term.write(" ".repeat(width));
 
                 cursorX = oldCursorX;
+            }
+
+            socket.on("clearLine", function (params) {
+               term.clearLine(); 
             });
 
+            function term.setCursorPos(x, y) {
+                cursorY = x;
+                cursorY = y;
+            }
+
             socket.on("setCursorPos", function (params) {
-                cursorX = Number(params[0]);
-                cursorY = Number(params[1]);
+                term.setCursorPos(Number(params[0]), Number(params[1]));
             });
 
             function blinkCursorOn() {
@@ -391,9 +406,9 @@
                 }
 
                 if (textBuffer[cursorX] && textBuffer[cursorX][cursorY]) {
-                    cc_write(textBuffer[cursorX][cursorY]);
+                    term.write(textBuffer[cursorX][cursorY]);
                 } else {
-                    cc_write(" ");
+                    term.write(" ");
                 }
 
                 cursorX = oldCursorX;
@@ -405,16 +420,19 @@
             }
             blinkCursorOn();
 
+            function term.setCursorBlink(state) {
+                cursorBlink = state;
+            }
+
             socket.on("setCursorBlink", function (params) {
                 if (params == "true") {
-                    cursorBlink = true;
+                    term.setCursorBlink(true);
                 } else if (params == "false") {
-                    cursorBlink = false;
+                    term.setCursorBlink(false);
                 }
             });
 
-            socket.on("scroll", function (params) {
-                var lines = Number(params);
+            function term.scroll(lines) {
                 var oldCursorX = cursorX;
                 var oldCursorY = cursorY;
 
@@ -476,27 +494,39 @@
                         }
 
                         if (textBuffer[x] && textBuffer[x][y]) {
-                            cc_write(textBuffer[x][y]);
+                            term.write(textBuffer[x][y]);
                         } else {
-                            cc_write(" ");
+                            term.write(" ");
                         }
                     }
                 }
 
                 cursorX = oldCursorX;
                 cursorY = oldCursorY;
+            }
+
+            socket.on("scroll", function (params) {
+                term.scroll(Number(params));
             });
+
+            function term.setTextColor(colour) {
+                textColour = colours[colour];
+            }
 
             socket.on("setTextColor", function (params) {
-                textColour = colours[params] || "#F0F0F0";
+                term.setTextColor(params || "#F0F0F0");
             });
 
-            socket.on("setBackgroundColor", function (params) {
-                if (params == "32768") {
+            function term.setBackgroundColor(colour) {
+                if (colour == "32768") {
                     backColour = "#000000"; //Replace black with a darker shade
                 } else {
-                    backColour = colours[params] || "#000000";
+                    backColour = colours[colour];
                 }
+            }
+
+            socket.on("setBackgroundColor", function (params) {
+                term.setBackgroundColor(params || "#000000");
             });
 
             socket.on("setDisplaySize", function (params) {
@@ -662,9 +692,9 @@
                         }
 
                         if (textBuffer[x] && textBuffer[x][y]) {
-                            cc_write(textBuffer[x][y]);
+                            term.write(textBuffer[x][y]);
                         } else {
-                            cc_write(" ");
+                            term.write(" ");
                         }
                     }
                 }
