@@ -76,7 +76,7 @@ resources.turtleNormal.src = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAA
 resources.turtleAdvanced = new Image();
 resources.turtleAdvanced.src = "data:image/png;base64,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";
 
-Term = function (canvasObj) {
+Term = function (canvasObj, showBorder) {
 	//Check if canvasObj is a canvas --TODO
 
 	this.canvas = canvasObj;
@@ -102,9 +102,8 @@ Term = function (canvasObj) {
 	this.backColourBuffer = {};
 
 	this.displayType = "normal";
-	function this.setDisplayType(displayType) {
-		this.displayType = displayType;
-	}
+
+	this.showBorder = showBorder || false;
 
 	//Begin "term" methods
 	function this.write(text) {
@@ -346,6 +345,10 @@ Term = function (canvasObj) {
     this.getBackgroundColour = this.getBackgroundColor;
 	//End "term" methods
 
+	function this.setDisplayType(displayType) {
+		this.displayType = displayType;
+	}
+
 	function this.drawScreen() {
 		var oldCursorX = this.cursorX;
         var oldCursorY = this.cursorY;
@@ -397,54 +400,56 @@ Term = function (canvasObj) {
         var this.screenY = Math.floor((this.canvas.height - screenHeight) / 2);
 
         //Draw the border
-        switch (displayType) {
-        	default:
-            case "normal":
-                this.ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-                this.ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-                this.ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-                this.ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
-                this.ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-                this.ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-                this.ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-                this.ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
-                break;
-            case "advanced":
-                this.ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-                this.ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-                this.ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-                this.ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
-                this.ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-                this.ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-                this.ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-                this.ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
-                break;
-            case "command":
-                this.ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-                this.ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-                this.ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-                this.ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
-                this.ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-                this.ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-                this.ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-                this.ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
-                break;
-            case "turtleNormal":
-                //Not currently functional, use "normal"
-                this.width = 39;
-                this.height = 13;
+        if (this.showBorder) {
+	        switch (displayType) {
+	        	default:
+	            case "normal":
+	                this.ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
+	                this.ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
+	                this.ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
+	                this.ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+	                this.ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
+	                this.ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
+	                this.ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
+	                this.ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+	                break;
+	            case "advanced":
+	                this.ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
+	                this.ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
+	                this.ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
+	                this.ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+	                this.ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
+	                this.ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
+	                this.ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
+	                this.ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+	                break;
+	            case "command":
+	                this.ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
+	                this.ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
+	                this.ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
+	                this.ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+	                this.ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
+	                this.ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
+	                this.ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
+	                this.ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+	                break;
+	            case "turtleNormal":
+	                //Not currently functional, use "normal"
+	                this.width = 39;
+	                this.height = 13;
 
-                this.screenPixelSize = Math.min(canvas.width / 254, canvas.height / 217);
+	                this.screenPixelSize = Math.min(canvas.width / 254, canvas.height / 217);
 
-                var frameWidth = this.screenPixelSize * 254;
-                var frameHeight = this.screenPixelSize * 217;
+	                var frameWidth = this.screenPixelSize * 254;
+	                var frameHeight = this.screenPixelSize * 217;
 
-                var frameX = Math.floor((canvas.width - frameWidth) / 2);
-                var frameY = Math.floor((canvas.height - frameHeight) / 2);
+	                var frameX = Math.floor((canvas.width - frameWidth) / 2);
+	                var frameY = Math.floor((canvas.height - frameHeight) / 2);
 
-                this.ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
-                break;
-        }
+	                this.ctx.drawImage(resources.turtleNormal, 0, 0, 254, 217, frameX, frameY, frameWidth, frameHeight);
+	                break;
+	        }
+	    }
 
       	this.drawScreen();
 	}
