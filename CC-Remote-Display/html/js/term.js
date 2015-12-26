@@ -54,7 +54,7 @@
 	    "d": "#57A64E",
 	    "e": "#CC4C4C",
 	    "f": "#191919"
-	};    
+	};
 
 	//Load resources
 	var resources = {};
@@ -91,10 +91,14 @@
 
 				this.ctx = canvas.getContext("2d");
 				this.ctx.imageSmoothingEnabled = false;
+
+				this.draw();
 			}
 		});
 
-		this.canvas = canvasObj;
+		this.canvasObj = canvasObj;
+		this.ctx = canvasObj.getContext("2d");
+		this.ctx.imageSmoothingEnabled = false;
 
 		this.width = 51;
 		this.height = 19;
@@ -284,38 +288,48 @@
 
 	        //Shift lines down or up
 	        if (lines > 0) {
-	            for (y=2; y<=this.height; y++) {
-	                if (y - lines >= 1) {
-	                    for (x=1; x<=this.width; x++) {
-	                        this.textBuffer[x][y - lines] = this.textBuffer[x][y];
-	                        this.textColourBuffer[x][y - lines] = this.textColourBuffer[x][y];
-	                        this.backColourBuffer[x][y - lines] = this.backColourBuffer[x][y];
-	                    }
-	                } else {break;}
+	            for (y=lines; y<=this.height; y++) {
+	            	var newLine = y - lines;
+                    for (x=1; x<=this.width; x++) {
+                        this.textBuffer[x][newLine] = (this.textBuffer[x] || {})[y] || " ";
+                        this.textColourBuffer[x][newLine] = (this.textColourBuffer[x] || {})[y] || "#F0F0F0";
+                        this.backColourBuffer[x][newLine] = (this.backColourBuffer[x] || {})[y] || "#000000";
+                    }
 	            }
 
-	            for (y=this.height; y>=this.height-lines; y--) {
+	            for (y=this.height; y>=this.height-lines+1; y--) {
 	                for (x=1; x<=this.width; x++) {
+	                	if (!this.textBuffer[x]) this.textBuffer[x] = {};
 	                    this.textBuffer[x][y] = " ";
+
+	                    if (!this.textColourBuffer[x]) this.textColourBuffer[x] = {};
 	                    this.textColourBuffer[x][y] = this.textColour;
+
+	                    if (!this.backColourBuffer[x]) this.backColourBuffer[x] = {};
 	                    this.backColourBuffer[x][y] = this.backColour;
 	                }
 	            }
 	        } else {
-	            for (y=this.height - 1; y>=1; y--) {
-	                if (y + lines <= this.height) {
-	                    for (x=1; x<=this.width; x++) {
-	                        this.textBuffer[x][y + lines] = this.textBuffer[x][y];
-	                        this.textColourBuffer[x][y + lines] = this.textColourBuffer[x][y];
-	                        this.backColourBuffer[x][y + lines] = this.backColourBuffer[x][y];
-	                    }
-	                } else {break;}
+	        	lines = Math.abs(lines);
+
+	            for (y=this.height - lines; y>=1; y--) {
+	            	var newLine = y + lines;
+                    for (x=1; x<=this.width; x++) {
+                        this.textBuffer[x][newLine] = (this.textBuffer[x] || {})[y] || " ";
+                        this.textColourBuffer[x][newLine] = (this.textColourBuffer[x] || {})[y] || "#F0F0F0";
+                        this.backColourBuffer[x][newLine] = (this.backColourBuffer[x] || {})[y] || "#000000";
+                    }
 	            }
 
 	            for (y=1; y<=lines; y++) {
 	                for (x=1; x<=this.width; x++) {
+	                    if (!this.textBuffer[x]) this.textBuffer[x] = {};
 	                    this.textBuffer[x][y] = " ";
+
+	                    if (!this.textColourBuffer[x]) this.textColourBuffer[x] = {};
 	                    this.textColourBuffer[x][y] = this.textColour;
+
+	                    if (!this.backColourBuffer[x]) this.backColourBuffer[x] = {};
 	                    this.backColourBuffer[x][y] = this.backColour;
 	                }
 	            }
