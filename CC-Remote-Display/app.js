@@ -5,10 +5,6 @@ var io = require("socket.io")(http);
 
 var connectedRooms = {};
 
-app.get("/", function(req, res) {
-    res.sendFile(__dirname + "/html/index.html");
-})
-
 app.get("/pull", function(req, res) {
     res.send("Temp");
 })
@@ -117,8 +113,7 @@ app.get("/push", function(req, res) {
     res.send("ok");
 })
 
-app.use("/js", express.static(__dirname + "/html/js"));
-app.use("/resources", express.static(__dirname + "/html/resources"));
+app.use("/", express.static(__dirname + "/html"));
 
 app.use(function(req, res) {
     //Redirect other urls to home
