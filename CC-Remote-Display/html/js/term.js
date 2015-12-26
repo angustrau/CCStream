@@ -77,13 +77,23 @@ resources.turtleAdvanced = new Image();
 resources.turtleAdvanced.src = "data:image/png;base64,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";
 
 Term = function (canvasObj, showBorder) {
-	//Check if canvasObj is a canvas --TODO
+	//Check if canvasObj is a canvas
+	if (!canvasObj || !canvasObj.getContext) {
+		//Not a canvas or canvas not supported
+		throw "Invalid canvas";
+	}
+
+	Object.defineProperty(this, "canvas", {
+		get: function() { return this.canvasObj; },
+		set: function(canvas) {
+			this.canvasObj = canvas;
+
+			this.ctx = canvas.getContext("2d");
+			this.ctx.imageSmoothingEnabled = false;
+		}
+	});
 
 	this.canvas = canvasObj;
-
-    //Get canvas context
-	var this.ctx = this.canvas.getContext("2d");
-	ctx.imageSmoothingEnabled = false;
 
 	this.width = 51;
 	this.height = 19;
@@ -107,7 +117,7 @@ Term = function (canvasObj, showBorder) {
 	this.showBorder = showBorder || false;
 
 	//Begin "term" methods
-	function this.write(text) {
+	this.write = function(text) {
 	    text.replace(/\\n/g, "\n").split("").forEach(function (char) {
 	        if (char == "\n") {
 	            this.cursorX = 1;
@@ -148,10 +158,10 @@ Term = function (canvasObj, showBorder) {
 	        this.ctx.fillRect(this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3);
 
 	        this.cursorX = this.cursorX + 1;
-	    });
+	    }, this);
 	}
 
-	function this.blit(text, textColours, backColours) {
+	this.blit = function(text, textColours, backColours) {
         for (i = 0; i < Math.min(text.length, textColours.length, backColours.length) ; i++) {
             this.textColour = paintColours[textColours[i]];
             this.backColour = paintColours[backColours[i]];
@@ -161,7 +171,7 @@ Term = function (canvasObj, showBorder) {
         }
     }
 
-    function this.clear() {
+    this.clear = function() {
         var oldCursorX = this.cursorX;
         var oldCursorY = this.cursorY;
 
@@ -174,7 +184,7 @@ Term = function (canvasObj, showBorder) {
         this.cursorY = oldCursorY;
     }
 
-    function this.clearLine() {
+    this.clearLine = function() {
         var oldCursorX = this.cursorX;
 
         this.cursorX = 1;
@@ -184,16 +194,16 @@ Term = function (canvasObj, showBorder) {
         this.cursorX = oldCursorX;
     }
 
-    function this.setCursorPos(x, y) {
+    this.setCursorPos = function(x, y) {
     	this.cursorX = x;
     	this.cursorY = y;
     }
 
-    function this.getCursorPos() {
+    this.getCursorPos = function() {
     	return [this.cursorX, this.cursorY];
     }
 
-    function this.blinkCursorOn() {
+    this.blinkCursorOn = function() {
         if (this.cursorBlink) {
             this.lastBlinkX = this.cursorX;
             this.lastBlinkY = this.cursorY;
@@ -204,17 +214,17 @@ Term = function (canvasObj, showBorder) {
             this.ctx.fillRect(this.screenX + (this.cursorX - 5/6) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1/9) * this.screenPixelSize * 3, this.screenPixelSize * 1.6, this.screenPixelSize / 9 * 3);
         }
 
-        setTimeout(function() { this.blinkCursorOff(); }, 1000);
+        setTimeout(function(tObj) { tObj.blinkCursorOff(); }, 1000, this);
     }
 
-    function this.blinkCursorOff() {
+    this.blinkCursorOff = function() {
         var oldCursorX = this.cursorX;
         var oldCursorY = this.cursorY;
         var oldTextColour = this.textColour;
         var oldBackColour = this.backColour;
 
-        this.cursorX = lastBlinkX;
-        this.cursorY = lastBlinkY;
+        this.cursorX = this.lastBlinkX;
+        this.cursorY = this.lastBlinkY;
 
         if (this.textColourBuffer[this.cursorX]) {
             this.textColour = this.textColourBuffer[this.cursorX][this.cursorY] || "#F0F0F0";
@@ -238,16 +248,16 @@ Term = function (canvasObj, showBorder) {
         this.cursorY = oldCursorY;
         this.textColour = oldTextColour;
         this.backColour = oldBackColour;
-
-        setTimeout(function () { this.blinkCursorOn(); }, 1000);
+  
+        setTimeout(function (tObj) { tObj.blinkCursorOn(); }, 1000, this);
     }
     this.blinkCursorOn();
 
-    function this.setCursorBlink(state) {
+    this.setCursorBlink = function(state) {
         cursorBlink = state;
     }
 
-    function this.isColor() {
+    this.isColor = function() {
     	switch(this.displayType) {
     		case "normal":
     		case "turtleNormal":
@@ -263,11 +273,11 @@ Term = function (canvasObj, showBorder) {
     }
     this.isColour = this.isColor;
 
-    function this.getSize() {
+    this.getSize = function() {
     	return [this.width, this.height];
     }
 
-    function this.scroll(lines) {
+    this.scroll = function(lines) {
         var oldCursorX = this.cursorX;
         var oldCursorY = this.cursorY;
 
@@ -317,17 +327,17 @@ Term = function (canvasObj, showBorder) {
         this.cursorY = oldCursorY;
     }
 
-    function this.setTextColor(colour) {
+    this.setTextColor = function(colour) {
         this.textColour = colours[colour];
     }
     this.setTextColour = this.setTextColor;
 
-    function this.getTextColor() {
+    this.getTextColor = function() {
     	return cc_colours[this.textColour];
     }
     this.getTextColour = this.getTextColor;
 
-    function this.setBackgroundColor(colour) {
+    this.setBackgroundColor = function(colour) {
     	if (colour == 32768) {
             this.backColour = "#000000"; //Replace black with a darker shade
         } else {
@@ -336,7 +346,7 @@ Term = function (canvasObj, showBorder) {
     }
     this.setBackgroundColour = this.setBackgroundColor;
 
-    function this.getBackgroundColor() {
+    this.getBackgroundColor = function() {
     	if (this.backColour == "#000000") {
     		return 32768;
     	} else {
@@ -346,11 +356,11 @@ Term = function (canvasObj, showBorder) {
     this.getBackgroundColour = this.getBackgroundColor;
 	//End "term" methods
 
-	function this.setDisplayType(displayType) {
+	this.setDisplayType = function(displayType) {
 		this.displayType = displayType;
 	}
 
-	function this.drawScreen() {
+	this.drawScreen = function() {
 		var oldCursorX = this.cursorX;
         var oldCursorY = this.cursorY;
         var oldBackColour = this.backColour;
@@ -389,20 +399,20 @@ Term = function (canvasObj, showBorder) {
         this.backColour = oldBackColour;
 	}
 
-	function this.draw() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.draw = function() {
+		this.ctx.clearRect(0, 0, this.canvasObj.width, this.canvasObj.height);
 
-        this.screenPixelSize = Math.floor(Math.min(this.canvas.width / (this.width * 2), this.canvas.height / (this.height * 3)));
+        this.screenPixelSize = Math.floor(Math.min(this.canvasObj.width / (this.width * 2), this.canvasObj.height / (this.height * 3)));
 
         var screenWidth = this.screenPixelSize * this.width * 2;
         var screenHeight = this.screenPixelSize * this.height * 3;
 
-        var this.screenX = Math.floor((this.canvas.width - screenWidth) / 2);
-        var this.screenY = Math.floor((this.canvas.height - screenHeight) / 2);
+        this.screenX = Math.floor((this.canvasObj.width - screenWidth) / 2);
+        this.screenY = Math.floor((this.canvasObj.height - screenHeight) / 2);
 
         //Draw the border
         if (this.showBorder) {
-	        switch (displayType) {
+	        switch (this.displayType) {
 	        	default:
 	            case "normal":
 	                this.ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
