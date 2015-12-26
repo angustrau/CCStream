@@ -117,7 +117,7 @@
 		this.textColourBuffer = {};
 		this.backColourBuffer = {};
 
-		this.displayType = "normal";
+		this.displayType = "advanced";
 
 		this.showBorder = showBorder || false;
 
