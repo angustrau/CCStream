@@ -122,47 +122,57 @@
 		this.showBorder = showBorder || false;
 
 		//Begin "term" methods
-		this.write = function(text) {
-		    text.replace(/\\n/g, "\n").split("").forEach(function (char) {
-		        if (char == "\n") {
-		            this.cursorX = 1;
-		            this.cursorY = this.cursorY + 1;
-		            return;
-		        }
+		this.write = function(text) {			
+		    text.split("\n").forEach(function (line, index, lines) {
+		    	if (this.cursorY > this.height) return;
 
-		        if (this.cursorX > this.width || this.cursorY > this.height) {
-		        	this.cursorX = this.cursorX + 1;
-		            return;
-		        }
+		    	var textX = this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2;
+		    	var textY = this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3;
+		    	var textWidth = this.screenPixelSize * 2 * line.length;
+		    	if (textX + textWidth > this.screenX + this.screenWidth) {console.log(1);textWidth = this.screenX + this.screenWidth - textX;}
+		    	var textHeight = this.screenPixelSize * 3;
 
-		        //Store char to buffer
-		        if (!this.textBuffer[this.cursorX]) this.textBuffer[this.cursorX] = {};
-		        this.textBuffer[this.cursorX][this.cursorY] = char;
+		    	this.ctx.clearRect(textX, textY, textWidth, textHeight);
 
-		        if (!this.textColourBuffer[this.cursorX]) this.textColourBuffer[this.cursorX] = {};
-		        this.textColourBuffer[this.cursorX][this.cursorY] = this.textColour;
+		    	this.ctx.globalCompositeOperation = "source-over";
+		    	line.split("").forEach(function(char) {
+			        if (this.cursorX > this.width || this.cursorY > this.height) {
+			        	this.cursorX = this.cursorX + 1;
+			            return;
+			        }
 
-		        if (!this.backColourBuffer[this.cursorX]) this.backColourBuffer[this.cursorX] = {};
-		        this.backColourBuffer[this.cursorX][this.cursorY] = this.backColour;
+			        //Store char to buffer
+			        if (!this.textBuffer[this.cursorX]) this.textBuffer[this.cursorX] = {};
+			        this.textBuffer[this.cursorX][this.cursorY] = char;
 
-		        this.ctx.globalCompositeOperation = "source-over";
-		        this.ctx.clearRect(this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3)
+			        if (!this.textColourBuffer[this.cursorX]) this.textColourBuffer[this.cursorX] = {};
+			        this.textColourBuffer[this.cursorX][this.cursorY] = this.textColour;
 
-		        //Draw text
-		        var charCode = char.charCodeAt(0);
-		        this.ctx.drawImage(resources.termFont, (charCode % 16) * 6, Math.floor(charCode / 16) * 9, 6, 9, this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3);
+			        if (!this.backColourBuffer[this.cursorX]) this.backColourBuffer[this.cursorX] = {};
+			        this.backColourBuffer[this.cursorX][this.cursorY] = this.backColour;
+			        
+			        //Draw text
+			        var charCode = char.charCodeAt(0);
+			        this.ctx.drawImage(resources.termFont, (charCode % 16) * 6, Math.floor(charCode / 16) * 9, 6, 9, this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3);
 
-		        //Colourise text
+			        this.cursorX = this.cursorX + 1;
+			    }, this);
+
+				//Colourise text
 		        this.ctx.globalCompositeOperation = "source-atop";
 		        this.ctx.fillStyle = this.textColour;
-		        this.ctx.fillRect(this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3);
-
-		        //Draw background
+		        this.ctx.fillRect(textX, textY, textWidth, textHeight);
+				
+				//Draw background
 		        this.ctx.globalCompositeOperation = "destination-over";
 		        this.ctx.fillStyle = this.backColour;
-		        this.ctx.fillRect(this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2, this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3, this.screenPixelSize * 2, this.screenPixelSize * 3);
+		        this.ctx.fillRect(textX, textY, textWidth, textHeight)
 
-		        this.cursorX = this.cursorX + 1;
+				if (index != lines.length - 1) {
+					//New line
+					this.cursorX = 1;
+					this.cursorY = this.cursorY + 1;
+				}
 		    }, this);
 		}
 
@@ -419,45 +429,45 @@
 
 	        this.screenPixelSize = Math.floor(Math.min(this.canvasObj.width / (this.width * 2), this.canvasObj.height / (this.height * 3)));
 
-	        var screenWidth = this.screenPixelSize * this.width * 2;
-	        var screenHeight = this.screenPixelSize * this.height * 3;
+	        this.screenWidth = this.screenPixelSize * this.width * 2;
+	        this.screenHeight = this.screenPixelSize * this.height * 3;
 
-	        this.screenX = Math.floor((this.canvasObj.width - screenWidth) / 2);
-	        this.screenY = Math.floor((this.canvasObj.height - screenHeight) / 2);
+	        this.screenX = Math.floor((this.canvasObj.width - this.screenWidth) / 2);
+	        this.screenY = Math.floor((this.canvasObj.height - this.screenHeight) / 2);
 
 	        //Draw the border
 	        if (this.showBorder) {
 		        switch (this.displayType) {
 		        	default:
 		            case "normal":
-		                this.ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-		                this.ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-		                this.ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-		                this.ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+		                this.ctx.drawImage(resources.normalCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, this.screenHeight); //Left
+		                this.ctx.drawImage(resources.normalCorners, 36, 29, 12, 226, this.screenX + this.screenWidth, this.screenY, 12, this.screenHeight); //Right
+		                this.ctx.drawImage(resources.normalCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, this.screenWidth, 12); //Top
+		                this.ctx.drawImage(resources.normalCorners, 0, 12, 256, 12, this.screenX, this.screenY + this.screenHeight, this.screenWidth, 12); //Bottom
 		                this.ctx.drawImage(resources.normalCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-		                this.ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-		                this.ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-		                this.ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+		                this.ctx.drawImage(resources.normalCorners, 24, 28, 12, 12, this.screenX + this.screenWidth, this.screenY - 12, 12, 12); //Top-Right
+		                this.ctx.drawImage(resources.normalCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + this.screenHeight, 12, 12); //Bottom-Left
+		                this.ctx.drawImage(resources.normalCorners, 24, 40, 12, 12, this.screenX + this.screenWidth, this.screenY + this.screenHeight, 12, 12); //Bottom-Right
 		                break;
 		            case "advanced":
-		                this.ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-		                this.ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-		                this.ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-		                this.ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+		                this.ctx.drawImage(resources.advancedCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, this.screenHeight); //Left
+		                this.ctx.drawImage(resources.advancedCorners, 36, 29, 12, 226, this.screenX + this.screenWidth, this.screenY, 12, this.screenHeight); //Right
+		                this.ctx.drawImage(resources.advancedCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, this.screenWidth, 12); //Top
+		                this.ctx.drawImage(resources.advancedCorners, 0, 12, 256, 12, this.screenX, this.screenY + this.screenHeight, this.screenWidth, 12); //Bottom
 		                this.ctx.drawImage(resources.advancedCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-		                this.ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-		                this.ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-		                this.ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+		                this.ctx.drawImage(resources.advancedCorners, 24, 28, 12, 12, this.screenX + this.screenWidth, this.screenY - 12, 12, 12); //Top-Right
+		                this.ctx.drawImage(resources.advancedCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + this.screenHeight, 12, 12); //Bottom-Left
+		                this.ctx.drawImage(resources.advancedCorners, 24, 40, 12, 12, this.screenX + this.screenWidth, this.screenY + this.screenHeight, 12, 12); //Bottom-Right
 		                break;
 		            case "command":
-		                this.ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, screenHeight); //Left
-		                this.ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, this.screenX + screenWidth, this.screenY, 12, screenHeight); //Right
-		                this.ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, screenWidth, 12); //Top
-		                this.ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, this.screenX, this.screenY + screenHeight, screenWidth, 12); //Bottom
+		                this.ctx.drawImage(resources.commandCorners, 0, 29, 12, 226, this.screenX - 12, this.screenY, 12, this.screenHeight); //Left
+		                this.ctx.drawImage(resources.commandCorners, 36, 29, 12, 226, this.screenX + this.screenWidth, this.screenY, 12, this.screenHeight); //Right
+		                this.ctx.drawImage(resources.commandCorners, 0, 0, 256, 12, this.screenX, this.screenY - 12, this.screenWidth, 12); //Top
+		                this.ctx.drawImage(resources.commandCorners, 0, 12, 256, 12, this.screenX, this.screenY + this.screenHeight, this.screenWidth, 12); //Bottom
 		                this.ctx.drawImage(resources.commandCorners, 12, 28, 12, 12, this.screenX - 12, this.screenY - 12, 12, 12); //Top-Left
-		                this.ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, this.screenX + screenWidth, this.screenY - 12, 12, 12); //Top-Right
-		                this.ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + screenHeight, 12, 12); //Bottom-Left
-		                this.ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, this.screenX + screenWidth, this.screenY + screenHeight, 12, 12); //Bottom-Right
+		                this.ctx.drawImage(resources.commandCorners, 24, 28, 12, 12, this.screenX + this.screenWidth, this.screenY - 12, 12, 12); //Top-Right
+		                this.ctx.drawImage(resources.commandCorners, 12, 40, 12, 12, this.screenX - 12, this.screenY + this.screenHeight, 12, 12); //Bottom-Left
+		                this.ctx.drawImage(resources.commandCorners, 24, 40, 12, 12, this.screenX + this.screenWidth, this.screenY + this.screenHeight, 12, 12); //Bottom-Right
 		                break;
 		            case "turtleNormal":
 		                //Not currently functional, use "normal"
