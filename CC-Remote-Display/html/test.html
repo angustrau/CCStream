@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<title>term.js Test</title>
+
+		<style>
+			#display1 {
+				position: fixed;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: 50vw;
+				height: 100vh;
+				background-color: yellow;
+			}
+
+			#display2 {
+				position: fixed;
+				top: 0;
+				bottom: 0;
+				left: 50%;
+				width: 50vw;
+				height: 100vh;
+				background-color: blue;
+			}
+		</style>
+	</head>
+
+	<body>
+		<script src="js/jquery-2.1.4.min.js"></script>
+		<script type="text/javascript" src="js/term.js"></script>
+
+		<canvas id="display1"></canvas>
+		<canvas id="display2"></canvas>
+
+		<script type="text/javascript">
+			var display1 = document.getElementById("display1");
+            display1.width = window.innerWidth / 2;
+            display1.height = window.innerHeight;
+
+            var display2 = document.getElementById("display2");
+            display2.width = window.innerWidth / 2;
+            display2.height = window.innerHeight;
+
+            $(window).resize(function () {
+                display1.width = window.innerWidth / 2;
+                display1.height = window.innerHeight;
+
+                display2.width = window.innerWidth / 2;
+            	display2.height = window.innerHeight;
+
+                term.draw();
+            });
+
+			var term = new Term(document.getElementById("display1"), false);
+
+			function scrollTest() {
+				term.setBackgroundColour(1);
+				term.clear()
+
+				term.setBackgroundColour(32768);
+				term.setCursorPos(5, 1);
+				term.write("5, 1");
+
+				term.setBackgroundColour(2);
+				term.setCursorPos(45, 6);
+				term.write("45, 6hdkahdjksahdjkashdkjashjkas");
+
+				term.setBackgroundColour(64);
+				term.setCursorPos(25, 19);
+				term.write("25, 19");
+			}
+
+			function mouse_click(button, x, y) {
+				console.log(button, x, y);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(2);
+				term.write("c");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_click", mouse_click);
+
+			function mouse_up(button, x, y) {
+				console.log(button, x, y);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(16384);
+				term.write("u");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_up", mouse_up);
+
+			function mouse_drag(button, x, y) {
+				console.log(button, x, y);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(8);
+				term.write("m");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_drag", mouse_drag);
+
+			function mouse_scroll(direction, x, y) {
+				console.log(direction, x, y);
+
+				term.scroll(direction);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(8192);
+				term.write("s");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_scroll", mouse_scroll);
+		</script>
+	</body>
+</html>
