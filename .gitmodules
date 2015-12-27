@@ -1,0 +1,3 @@
+[submodule "CC-Remote-Display/html/js/term.js"]
+	path = CC-Remote-Display/html/js/term.js
+	url = https://github.com/angustrau/term.js.git
