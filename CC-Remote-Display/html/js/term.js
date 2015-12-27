@@ -87,10 +87,15 @@
 		Object.defineProperty(this, "canvas", {
 			get: function() { return this.canvasObj; },
 			set: function(canvas) {
+				this.removeEventListeners();
+				this.ctx.clearRect(0, 0, this.canvasObj.width, this.canvasObj.height);
+
 				this.canvasObj = canvas;
 
 				this.ctx = canvas.getContext("2d");
 				this.ctx.imageSmoothingEnabled = false;
+
+				this.addEventListeners();
 
 				this.draw();
 			}
@@ -386,6 +391,10 @@
 		}
 
 		this.callbacks = {
+			char: [],
+			key: [],
+			key_up: [],
+
 			mouse_click: [],
 			mouse_up: [],
 			mouse_scroll: [],
@@ -406,21 +415,23 @@
 			}
 		}
 
-		this.mouseX = 0;
-		this.mouseY = 0;
-
 		this.toPixel = function(x, y) {
 			return [Math.max(1, Math.min(this.width, Math.ceil(x / this.screenPixelSize / 2))), Math.max(1, Math.min(this.height, Math.ceil(y / this.screenPixelSize / 3)))];
 		}
 
+		//Mouse
+
+		this.mouseX = 0;
+		this.mouseY = 0;
+
 		this.onMouseDown = function(e) {
 			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
-				tObj.mouseX = e.clientX - tObj.screenX;
-				tObj.mouseY = e.clientY - tObj.screenY;
+				tObj.mouseX = e.clientX - e.target.offsetLeft - tObj.screenX;
+				tObj.mouseY = e.clientY - e.target.offsetTop - tObj.screenY;
 
 				var location = tObj.toPixel(tObj.mouseX, tObj.mouseY);
 
-				var button = e.button;
+				var button = e.button || 0;
 				//Convert button code to CC's format
 				switch(button) {
 					case 0:
@@ -453,8 +464,8 @@
 		}
 
 		this.onMouseUp = function(e) {
-			var mouseX = e.clientX - tObj.screenX;
-			var mouseY = e.clientY - tObj.screenY;
+			var mouseX = e.clientX - e.target.offsetLeft - tObj.screenX;
+			var mouseY = e.clientY - e.target.offsetTop - tObj.screenY;
 
 			var location = tObj.toPixel(mouseX, mouseY);
 
@@ -490,8 +501,8 @@
 
 		this.onMouseMove = function(e) {
 			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
-				tObj.mouseX = e.clientX - tObj.screenX;
-				tObj.mouseY = e.clientY - tObj.screenY;
+				tObj.mouseX = e.clientX - e.target.offsetLeft - tObj.screenX;
+				tObj.mouseY = e.clientY - e.target.offsetTop - tObj.screenY;
 
 				var location = tObj.toPixel(tObj.mouseX, tObj.mouseY);
 
@@ -530,8 +541,8 @@
 
 		this.onMouseScroll = function(e) {
 			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
-				var mouseX = e.clientX - tObj.screenX;
-				var mouseY = e.clientY - tObj.screenY;
+				var mouseX = e.clientX - e.target.offsetLeft - tObj.screenX;
+				var mouseY = e.clientY - e.target.offsetTop - tObj.screenY;
 
 				var location = tObj.toPixel(mouseX, mouseY);
 
@@ -539,6 +550,70 @@
 			}
 		}
 		
+		//Handle touches created by a touch screen device
+
+		this.ongoingTouches = [];
+
+		this.onTouchStart = function(e) {
+			e.changedTouches.forEach(function(touch) {
+				tObj.ongoingTouches.push(touch);
+
+				tObj.onMouseDown(touch);
+			});
+
+			e.preventDefault();
+		}
+
+		this.onTouchEnd = function(e) {
+
+		}
+
+		this.onTouchCancel = function(e) {
+
+		}
+
+		this.onTouchMove = function(e) {
+
+		}
+
+		//Keyboard
+		var keyInputActive = true
+
+		this.onKeyDown = function(e) {
+			if (e.repeat == false) {
+				tObj.triggerEvent("key", [e.keyCode, false]);
+			} else if (e.repeat == true) {
+				tObj.triggerEvent("key", [e.keyCode, true]);
+			}
+
+			if (e.keyCode >= 32) {
+				tObj.triggerEvent("char", [String.fromCharCode(e.keyCode)]);
+			}
+			
+			e.preventDefault();
+		}
+
+		this.onKeyUp = function(e) {
+			tObj.triggerEvent("key_up", [e.keyCode, false]);
+
+			e.preventDefault();
+		}
+
+		Object.defineProperty(this, "keyboardActive", {
+			get: function() { return keyInputActive; },
+			set: function(state) {
+				keyInputActive = state;
+				
+				if (state == true) {
+					window.addEventListener("keydown", this.onKeyDown, false);
+					window.addEventListener("keyup", this.onKeyUp, false);
+				} else if (state == false) {
+					window.removeEventListener("keydown", this.onKeyDown, false);
+					window.removeEventListener("keyup", this.onKeyUp, false);
+				}
+			}
+		});
+		this.keyboardActive = true;
 
 		this.addEventListeners = function() {
 			//Mouse down
@@ -550,6 +625,12 @@
 			//Mouse wheel
 			this.canvasObj.addEventListener("mousewheel", this.onMouseScroll, false);
 			this.canvasObj.addEventListener("DOMMouseScroll", this.onMouseScroll, false);
+
+			//Touch
+			this.canvasObj.addEventListener("touchstart", this.onTouchStart, false);
+			this.canvasObj.addEventListener("touchend", this.onTouchEnd, false);
+			this.canvasObj.addEventListener("touchcancel", this.onTouchCancel, false);
+			this.canvasObj.addEventListener("touchmove", this.onTouchMove);
 		}
 
 		this.removeEventListeners = function() {
@@ -565,6 +646,12 @@
 			//Mouse wheel
 			this.canvasObj.removeEventListener("mousewheel", this.onMouseScroll, false);
 			this.canvasObj.removeEventListener("DOMMouseScroll", this.onMouseScroll, false);
+
+			//Touch
+			this.canvasObj.removeEventListener("touchstart", this.onTouchStart, false);
+			this.canvasObj.removeEventListener("touchend", this.onTouchEnd, false);
+			this.canvasObj.removeEventListener("touchcancel", this.onTouchCancel, false);
+			this.canvasObj.removeEventListener("touchmove", this.onTouchMove);
 		}
 
 		this.addEventListeners();
