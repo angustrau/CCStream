@@ -72,68 +72,47 @@
 				term.write("25, 19");
 			}
 
-			function mouseTest() {
-				function mouse_click(button, x, y) {
-					console.log(button, x, y);
+			function mouse_click(button, x, y) {
+				console.log(button, x, y);
 
-					term.setCursorPos(x, y);
-					term.setBackgroundColour(2);
-					term.write("c");
-					term.setBackgroundColour(32768);
-				}
-				term.on("mouse_click", mouse_click);
-
-				function mouse_up(button, x, y) {
-					console.log(button, x, y);
-
-					term.setCursorPos(x, y);
-					term.setBackgroundColour(16384);
-					term.write("u");
-					term.setBackgroundColour(32768);
-				}
-				term.on("mouse_up", mouse_up);
-
-				function mouse_drag(button, x, y) {
-					console.log(button, x, y);
-
-					term.setCursorPos(x, y);
-					term.setBackgroundColour(8);
-					term.write("m");
-					term.setBackgroundColour(32768);
-				}
-				term.on("mouse_drag", mouse_drag);
-
-				function mouse_scroll(direction, x, y) {
-					console.log(direction, x, y);
-
-					term.scroll(direction);
-
-					term.setCursorPos(x, y);
-					term.setBackgroundColour(8192);
-					term.write("s");
-					term.setBackgroundColour(32768);
-				}
-				term.on("mouse_scroll", mouse_scroll);
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(2);
+				term.write("c");
+				term.setBackgroundColour(32768);
 			}
+			term.on("mouse_click", mouse_click);
 
-			function keyboardTest() {
-				term.setCursorBlink(true);
+			function mouse_up(button, x, y) {
+				console.log(button, x, y);
 
-				function mouse_click(button, x, y) {
-					console.log(button, x, y);
-
-					if (button == 1) {
-						term.setCursorPos(x, y);
-					}
-				}
-				term.on("mouse_click", mouse_click);
-
-				function key_char(char) {
-					console.log(char);
-					term.write(char);
-				}
-				term.on("char", key_char)
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(16384);
+				term.write("u");
+				term.setBackgroundColour(32768);
 			}
+			term.on("mouse_up", mouse_up);
+
+			function mouse_drag(button, x, y) {
+				console.log(button, x, y);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(8);
+				term.write("m");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_drag", mouse_drag);
+
+			function mouse_scroll(direction, x, y) {
+				console.log(direction, x, y);
+
+				term.scroll(direction);
+
+				term.setCursorPos(x, y);
+				term.setBackgroundColour(8192);
+				term.write("s");
+				term.setBackgroundColour(32768);
+			}
+			term.on("mouse_scroll", mouse_scroll);
 		</script>
 	</body>
 </html>
