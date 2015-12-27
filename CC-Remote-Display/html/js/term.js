@@ -124,19 +124,19 @@
 		//Begin "term" methods
 		this.write = function(text) {			
 		    text.split("\n").forEach(function (line, index, lines) {
-		    	if (this.cursorY > this.height) return;
+		    	if (this.cursorY < 1 || this.cursorY > this.height) return;
 
 		    	var textX = this.screenX + (this.cursorX - 1) * this.screenPixelSize * 2;
 		    	var textY = this.screenY + (this.cursorY - 1) * this.screenPixelSize * 3;
 		    	var textWidth = this.screenPixelSize * 2 * line.length;
-		    	if (textX + textWidth > this.screenX + this.screenWidth) {console.log(1);textWidth = this.screenX + this.screenWidth - textX;}
+		    	if (textX + textWidth > this.screenX + this.screenWidth) {textWidth = this.screenX + this.screenWidth - textX;}
 		    	var textHeight = this.screenPixelSize * 3;
 
 		    	this.ctx.clearRect(textX, textY, textWidth, textHeight);
 
 		    	this.ctx.globalCompositeOperation = "source-over";
 		    	line.split("").forEach(function(char) {
-			        if (this.cursorX > this.width || this.cursorY > this.height) {
+			        if (this.cursorX < 1 || this.cursorX > this.width || this.cursorY < 1 || this.cursorY > this.height) {
 			        	this.cursorX = this.cursorX + 1;
 			            return;
 			        }
@@ -385,13 +385,199 @@
 			this.displayType = displayType;
 		}
 
+		this.callbacks = {
+			mouse_click: [],
+			mouse_up: [],
+			mouse_scroll: [],
+			mouse_drag: []
+		};
+
+		this.on = function(event, callback) {
+			if (this.callbacks[event]) {
+				this.callbacks[event].push(callback);
+			}
+		}
+
+		this.triggerEvent = function(event, args) {
+			if (this.callbacks[event]) {
+				this.callbacks[event].forEach(function(callback) {
+					callback.apply(this, args);
+				})
+			}
+		}
+
+		this.mouseX = 0;
+		this.mouseY = 0;
+
+		this.toPixel = function(x, y) {
+			return [Math.max(1, Math.min(this.width, Math.ceil(x / this.screenPixelSize / 2))), Math.max(1, Math.min(this.height, Math.ceil(y / this.screenPixelSize / 3)))];
+		}
+
+		this.onMouseDown = function(e) {
+			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
+				tObj.mouseX = e.clientX - tObj.screenX;
+				tObj.mouseY = e.clientY - tObj.screenY;
+
+				var location = tObj.toPixel(tObj.mouseX, tObj.mouseY);
+
+				var button = e.button;
+				//Convert button code to CC's format
+				switch(button) {
+					case 0:
+						//left click
+						button = 1;
+						break;
+					case 1:
+						//scroll click
+						button = 3;
+						break;
+					case 2:
+						//right click
+						button = 2;
+						break;
+					default:
+						//Other button. Button code is incremented by 1 to prevent conflict
+						button = button + 1;
+						break;
+				}
+
+				//Add drag listener
+				tObj.lastDrag = location;
+				tObj.canvasObj.addEventListener("mousemove", tObj.onMouseMove, false);
+
+				//Trigger mouse click
+				tObj.triggerEvent("mouse_click", [button, location[0], location[1]]);
+
+				e.preventDefault();
+			}
+		}
+
+		this.onMouseUp = function(e) {
+			var mouseX = e.clientX - tObj.screenX;
+			var mouseY = e.clientY - tObj.screenY;
+
+			var location = tObj.toPixel(mouseX, mouseY);
+
+			var button = e.button;
+			//Convert button code to CC's format
+			switch(button) {
+				case 0:
+					//left click
+					button = 1;
+					break;
+				case 1:
+					//scroll click
+					button = 3;
+					break;
+				case 2:
+					//right click
+					button = 2;
+					break;
+				default:
+					//Other button. Button code is incremented by 1 to prevent conflict
+					button = button + 1;
+					break;
+			}
+
+			tObj.canvasObj.removeEventListener("mousemove", tObj.onMouseMove, false);
+
+			tObj.triggerEvent("mouse_up", [button, location[0], location[1]]);
+
+			e.preventDefault();
+		}
+
+		this.lastDrag = [1, 1];
+
+		this.onMouseMove = function(e) {
+			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
+				tObj.mouseX = e.clientX - tObj.screenX;
+				tObj.mouseY = e.clientY - tObj.screenY;
+
+				var location = tObj.toPixel(tObj.mouseX, tObj.mouseY);
+
+				if (location[0] != tObj.lastDrag[0] || location[1] != tObj.lastDrag[1]) {
+					tObj.lastDrag = location;
+
+					var button = e.button;
+					//Convert button code to CC's format
+					switch(button) {
+						case 0:
+							//left click
+							button = 1;
+							break;
+						case 1:
+							//scroll click
+							button = 3;
+							break;
+						case 2:
+							//right click
+							button = 2;
+							break;
+						default:
+							//Other button. Button code is incremented by 1 to prevent conflict
+							button = button + 1;
+							break;
+					}
+
+					tObj.triggerEvent("mouse_drag", [button, location[0], location[1]]);
+
+					e.preventDefault();
+				}
+			} else {
+				tObj.onMouseUp(e);
+			}
+		}
+
+		this.onMouseScroll = function(e) {
+			if (e.offsetX >= tObj.screenX && e.offsetX <= tObj.screenX + tObj.screenWidth && e.offsetY >= tObj.screenY && e.offsetY <= tObj.screenY + tObj.screenHeight) {
+				var mouseX = e.clientX - tObj.screenX;
+				var mouseY = e.clientY - tObj.screenY;
+
+				var location = tObj.toPixel(mouseX, mouseY);
+
+				tObj.triggerEvent("mouse_scroll", [Math.max(-1, Math.min(1, (e.wheelDelta || -e.detail))) * -1, location[0], location[1]]);
+			}
+		}
+		
+
+		this.addEventListeners = function() {
+			//Mouse down
+			this.canvasObj.addEventListener("mousedown", this.onMouseDown, false);
+
+			//Mouse up
+			this.canvasObj.addEventListener("mouseup", this.onMouseUp, false);
+
+			//Mouse wheel
+			this.canvasObj.addEventListener("mousewheel", this.onMouseScroll, false);
+			this.canvasObj.addEventListener("DOMMouseScroll", this.onMouseScroll, false);
+		}
+
+		this.removeEventListeners = function() {
+			//Mouse down
+			this.canvasObj.removeEventListener("mousedown", this.onMouseDown, false);
+
+			//Mouse up
+			this.canvasObj.removeEventListener("mouseup", this.onMouseUp, false);
+
+			//Mouse move
+			this.canvasObj.removeEventListener("mousemove", this.onMouseMove, false);
+
+			//Mouse wheel
+			this.canvasObj.removeEventListener("mousewheel", this.onMouseScroll, false);
+			this.canvasObj.removeEventListener("DOMMouseScroll", this.onMouseScroll, false);
+		}
+
+		this.addEventListeners();
+
 		this.drawScreen = function() {
 			var oldCursorX = this.cursorX;
 	        var oldCursorY = this.cursorY;
+	        var oldCursorBlink = this.cursorBlink;
 	        var oldBackColour = this.backColour;
 
 	        this.cursorX = 1;
 	        this.cursorY = 1;
+	        this.cursorBlink = false;
 
 	        //Draw pixels
 	        for (y = 1; y <= this.height; y++) {
@@ -421,6 +607,7 @@
 
 	        this.cursorX = oldCursorX;
 	        this.cursorY = oldCursorY;
+	        this.cursorBlink = oldCursorBlink;
 	        this.backColour = oldBackColour;
 		}
 
@@ -490,5 +677,8 @@
 	      	this.drawScreen();
 		}
 		this.draw();
+
+		//Used for functions which can not access "this"
+		var tObj = this;
 	}
 })();
